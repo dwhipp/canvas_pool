@@ -74,10 +74,15 @@ Test.prototype.assertDotEquals = function(expect, actual) {
 }
 
 function RunTestGroup(group_name, group) {
+  var output_div = document.getElementById("main");
   var h1 = document.createElement("h1")
   h1.appendChild(document.createTextNode(group_name));
-  var output_div = document.getElementById("main");
   output_div.appendChild(h1);
+  var view = document.createElement("a");
+  var filename = group_name + '.js';
+  view.href = filename;
+  view.appendChild(document.createTextNode('View ' + filename));
+  output_div.appendChild(view);
   var ul = document.createElement("ul");
   output_div.appendChild(ul);
 
