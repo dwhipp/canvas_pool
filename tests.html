@@ -1,0 +1,130 @@
+<html>
+<head>
+
+<style type="text/css">
+ .group-pass { color: #0c0; }
+ .test-fail { color: #f00; }
+ .group-fail { background: #f00; }
+</style>
+
+<script type="text/javascript">
+
+function Test(name, ul) {
+  this.name = name;
+  this.ul = ul;
+  this.ok = true;
+}
+
+Test.prototype.appendMessage = function(msg, className) {
+  var li = document.createElement("li");
+  li.className = className;
+  li.appendChild(document.createTextNode('Test ' + this.name + ' : ' + msg[0]));
+  for (var i = 3; i < msg.length; i++) {
+    li.appendChild(document.createElement('br'));
+    li.appendChild(document.createTextNode(msg[i]));
+  }
+  this.ul.appendChild(li);
+}
+
+Test.prototype.emitResult = function() {
+  if (this.ok) {
+    this.appendMessage(['PASSED'], "group-pass");
+  } else {
+    this.appendMessage(['FAILED'], "group-fail");
+  }
+}
+
+Test.prototype.fail = function(msg) {
+  var e = new Error(msg);
+  var stack = e.stack
+        .replace(/^\s+at\s+/gm, '')
+        .replace(/^Object.<anonymous>\s*\(/gm, '{anonymous}()@')
+        .split('\n');
+  this.appendMessage(stack, "test-fail");
+  this.ok = false;
+}
+
+Test.prototype.assertTrue = function(cond) {
+  if (!cond) { this.fail("assertTrue") }
+}
+
+Test.prototype.assertFalse = function(cond) {
+  if (cond) { this.fail("assertFalse") }
+}
+
+Test.prototype.assertEquals = function(expect, actual) {
+  if (expect != actual) {
+    this.fail(
+        "assertEquals: expected[[" + expect + "]] actual[[" + actual + "]]");
+  }
+}
+
+Test.prototype.assertApproxEquals = function(expect, actual, epsilon) {
+  if (Math.abs(actual - expect) > epsilon) {
+    this.fail(
+        "assertEquals: expected[[" + expect + "]] actual[[" + actual + "]]");
+  }
+}
+
+Test.prototype.assertDotEquals = function(expect, actual) {
+  if (!expect.equals(actual)) {
+    this.fail(
+        "assertEquals: expected[[" + expect + "]] actual[[" + actual + "]]");
+  }
+}
+
+function RunTestGroup(group_name, group) {
+  var h1 = document.createElement("h1")
+  h1.appendChild(document.createTextNode(group_name));
+  var output_div = document.getElementById("main");
+  output_div.appendChild(h1);
+  var ul = document.createElement("ul");
+  output_div.appendChild(ul);
+
+  for (var item in group) {
+    var test = new Test(item, ul);
+    group[item](test);
+    test.emitResult();
+  }
+}
+
+var classes = new Array(
+    //"Ball",
+    //"Cushion",
+    //"Game",
+    //"Pocket",
+    "Polygon",
+    //"Shot",
+    //"Table",
+    "Vector"
+);
+
+var testGroups = {};
+function AddTestGroup(name, group) {
+  testGroups[name] = group;
+}
+
+var files = [];
+for (var i = 0; i < classes.length; ++i) {
+  files.push(classes[i] + '.js');
+  files.push(classes[i] + 'Test.js');
+}
+for (var i = 0; i < files.length; ++i) {
+  document.write(
+      "<script type='text/javascript' src='" + files[i] + "'></" + "script>");
+}
+
+function RunTests() {
+  for (var group in testGroups) {
+    RunTestGroup(group, testGroups[group]);
+  }
+}
+
+</script>
+</head>
+
+<body onload='RunTests()'>
+Test Results...
+<div id=main></div>
+</body>
+</html>

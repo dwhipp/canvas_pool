@@ -17,6 +17,10 @@ Vector.prototype.clone = function () {
     return new Vector( this.x, this.y );
 }
 
+Vector.prototype.equals = function (other) {
+  return this.x == other.x && this.y == other.y;
+}
+
 Vector.prototype.dot_product = function ( other ) {
     return this.x*other.x + this.y*other.y;
 }
