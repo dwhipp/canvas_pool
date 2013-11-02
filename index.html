@@ -1,12 +1,9 @@
 <html>
+<head>
+<title>Experiments building Pool and Snooker games</title>
+</head>
 
-<head><title>A Java Applet: Snooker</title></head>
-
-<body bgcolor="#c0c0c0">
-
-<h1>An HTML-5 Canvas Pool Table</h1>
-
-I created this page table as a launch point for my experimentation with Java (see below). More recently (Nov 2009) I've started playing with the HTML-5 Canvas element, and have created a similar app entirely in HTML+Javascript. Click <a href=canvas_pool.html>here</a> to try it.
+<body>
 
 <h1>A Java Applet: Snooker</h1>
 
@@ -14,34 +11,12 @@ Many years ago (mid 1990s) I wrote a simple Java Applet while
 teaching myself the language. At the time of writing it was a
 bit slow without a high-end processor, so I was overly worried
 about performance. These days it runs just fine.
+<ul><li><a href=java_snooker.html>Click to try it</a>.</ul>
 
-<p>
+<h1>An HTML-5 Canvas Pool Table</h1>
 
-You may notice that I haven't quite got the <a href='rules.html'>rules</a> right; and some of the ball replacement
-rules are a bit iffy. Even worse though, once you start applying spin,
-you'll find that even the laws of physics are not quite right.
-
-<p>
-
-Just click the mouse over the cue ball and drag a line away from it.
-The line represent the cue - its direction and power. Release the
-mouse button and take the shot. If you mess up, and want to
-re-take the shot: just press the space bar. The balls will be replaced.
-
-<p>
-There are several classes involved; so it may take a while to load.
-Also, please note that netscape is somewhat challenged by it - I sometimes get NullPointer Exceptions from the Java engine. I think its because I used a firly old version of the Java libraries, and then wrote it under Microsoft.
-<hr>
-<p>
-<center>
-<applet
-    code=javaTest.class
-    archive=snooker.jar
-    name=javaTest
-    width=800
-    height=400 >
-</applet>
-</center>
+In Nov 2009 I started playing with the HTML-5 Canvas element, and have created a similar app entirely in HTML+Javascript.
+<ul><li><a href=canvas_pool.html>Click to try it</a>.</ul>
 
 <p>
 <hr>
@@ -49,15 +24,6 @@ Also, please note that netscape is somewhat challenged by it - I sometimes get N
 If you have any comments then please feel free to <a href=mailto:snooker@dave.whipp.name>contact me</a>.
 <p>
 <a href=/index.html>Back</a> to my Home Page.
-
-<p>
-<hr>
-<p>
-I've had a request to make the source code available. Well,
-<a href=src/>here it is</a>. Its not of high quality -- it wrote it a few years ago when learning the language. Its written for Java 1.0, so
-you'll need to use the -deprecation flag when compiling it for
-jdk 1.1 and above.
-<p>
 
 </body>
 </html>
