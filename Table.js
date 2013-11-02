@@ -52,6 +52,10 @@ Table.prototype.initialize = function ( game ) {
     this.game.create_balls( ball_scale );
 }
 
+Table.prototype.player = function() {
+  return this.game.player();
+}
+
 Table.prototype.replace_ball = function ( ball ) {
 
     var x = -0.5;

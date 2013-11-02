@@ -1,21 +1,51 @@
 // The "Game" represents the game-state: 4 different games are
 // currently supported
 
-function Player(name, cue) {
-    this.name = name;
-    this.ball_color = false;
-    this.cue_color = cue;
-}
-
 function Game() {}
 function Game_ctor( game, name, table ) {
     game.name = name;
     game.table = table;
 
+    // TODO: Players lifespan should be greater than one game.
     game.players = new Array();
-    game.players.push( new Player( "Player 1", gold ) );
-    game.players.push( new Player( "Player 2", purple ) );
+    game.players.push( new HumanPlayer( "Player 1", gold ) );
+    game.players.push( new HumanPlayer( "Player 2", purple ) );
+    game.players[0].join_game(game, table);
+    game.players[1].join_game(game, table);
     game.current_player = 0;
+}
+
+Game.prototype.set_player_type = function(type, index) {
+  var prev = this.players[index];
+  var new_player;
+  if (type == 'Human') {
+    new_player = new HumanPlayer(prev.name, prev.cue_color);
+  } else {
+    new_player = new ComputerPlayer(prev.name, prev.cue_color);
+  }
+  this.players[index] = new_player;
+  new_player.join_game(this, this.table);
+  if (index == this.current_player && type != 'Human') {
+    if (this.table.is_stable()) {
+      new_player.begin_shot();
+    }
+  }
+}
+
+Game.prototype.player = function() {
+  return this.players[ this.current_player ];
+}
+
+Game.prototype.legal_balls = function(player) {
+  var legal = [];
+  var balls = this.table.balls;
+  for (i in balls) {
+    var ball = balls[i];
+    if (ball.name != 'cue') {
+      legal.push(ball);
+    }
+  }
+  return legal;
 }
 
 Game.prototype.create_ball = function ( x,y, color, name ) {
@@ -106,22 +136,24 @@ Game.prototype.get_shot_error = function () {
     var table = this.table;
     var error = "";
 
+    var player_name = this.player().name;
+
     if (this.potted_cue_ball) {
-        error = "You potted the cue ball";
+        error = player_name + " potted the cue ball";
         var cue_ball = table.cue_ball;
         table.balls.push( cue_ball );
     }
     else if (!this.first_collision) {
-        error = "You didn't hit any balls";
+        error = player_name + " didn't hit any balls";
     }
     else if (!this.first_contact_ok( this.first_collision )) {
-        error = "The first ball you made contact with was a "
+        error = "The first ball " + player_name + " made contact with was a "
             + this.first_collision.name
             + " ball, it should have been "
             + this.required_first_contact;
     }
     else if (!this.cushion_since_first_collision) {
-        error = "You didn't hit a cushion after hitting the object ball";
+        error = player_name + " didn't hit a cushion after hitting the object ball";
     }
 
     return error;
@@ -209,6 +241,7 @@ Game_0ball.prototype.shot_complete = function () {
         table.balls.push( cue_ball );
         table.ball_in_hand = 1;
     }
+    this.current_player = 1 - this.current_player;
 }
 
 Game_9ball.prototype.next_ball_to_pot = function () {
@@ -218,6 +251,14 @@ Game_9ball.prototype.next_ball_to_pot = function () {
         if (ball) return ball.name;
     }
     return false;
+}
+
+Game_9ball.prototype.legal_balls = function(player) {
+  for (var i = 1; i <= 10; ++i) {
+    var ball = this.ordered_balls[i];
+    if (ball) return [ ball ];
+  }
+  return [];
 }
 
 Game_9ball.prototype.super_ball_struck = Game.prototype.ball_struck;
@@ -301,6 +342,28 @@ Game_8ball.prototype.ball_struck = function () {
     else {
         status_message( player.name, " hoping to choose ball color" );
     }
+}
+
+
+Game_8ball.prototype.legal_balls = function(player) {
+  var eight = [];
+  var legal = [];
+  var balls = this.table.balls;
+  for (i in balls) {
+    var ball = balls[i];
+    if (ball.name == 'cue') {
+    } else if (ball.name == 'eight') {
+      eight = [ ball ];
+    } else if (player.ball_color) {
+      if (ball.name == player.ball_color) {
+        legal.push(ball)
+      }
+    } else {
+      legal.push(ball)
+    }
+  }
+  if (legal.length == 0) return eight;
+  return legal;
 }
 
 Game_8ball.prototype.shot_complete = function () {
@@ -391,5 +454,6 @@ Game_1ball.prototype.shot_complete = function () {
     }
     this.replace_potted_balls();
     this.replace_off_table_balls();
+    this.current_player = 1 - this.current_player;
 }
 

@@ -36,6 +36,7 @@ var classes = new Array(
         "Ball",
         "Cushion",
         "Game",
+        "Player",
         "Pocket",
         "Polygon",
         "Shot",
@@ -76,6 +77,18 @@ function GetXmlHttpObject() {
     }
     return null;
 }
+
+var current_game;
+function set_player_type(form, index) {
+  if (!current_game) return;
+  var type_rb = document.getElementsByName(form);
+  for (var i = 0; i < type_rb.length; ++i) {
+    if (type_rb[i].checked) {
+      current_game.set_player_type(type_rb[i].value, index);
+    }
+  }
+}
+
 
 function init_pool_table(name) {
 
@@ -225,33 +238,15 @@ function init_pool_table(name) {
         }
 
         function mouse_down(evt) {
-            if (!table.ball_in_hand) {
-                table.begin_shot( mouse_vec(evt) );
-            }
+          table.player().mouse_down(mouse_vec(evt));
         }
 
         function mouse_up(evt) {
-            var vec = mouse_vec(evt);
-            if (table.ball_in_hand) {
-                var cue_ball = table.cue_ball;
-                cue_ball.position = vec;
-                if ( cue_ball.is_valid_location(table) ) {
-                    table.ball_in_hand = 0;
-                }
-            }
-            else {
-                table.commit_shot( vec );
-            }
+          table.player().mouse_up(mouse_vec(evt));
         }
 
         function mouse_move(evt) {
-            var vec = mouse_vec(evt);
-            if (table.ball_in_hand) {
-                table.cue_ball.position = vec;
-            }
-            else {
-                table.adjust_shot( vec );
-            }
+          table.player().mouse_move(mouse_vec(evt));
         }
 
         canvas.addEventListener( 'mousedown', mouse_down, false );
@@ -300,9 +295,15 @@ function init_pool_table(name) {
                 clearInterval( table.update_id );
                 table.update_id = null;
                 table.game.shot_complete();
+                table.player().begin_shot();
             }
         }
 
         draw_id = setInterval( draw_fn, 50 );
+
+        current_game = table.game;
+        set_player_type("player1_type", 0);
+        set_player_type("player2_type", 1);
+        table.player().begin_shot();
     }
 }

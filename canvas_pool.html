@@ -8,14 +8,28 @@
 	This page contains the results of some experimentation with Javascript
 	and the HTML Canvas element. Please select an option:
         <p>
-        <form onclick='init_pool_table( "pool_table")'>
+        <table><tr>
+        <td><form onclick='init_pool_table("pool_table")'>
             <input type='radio' name='pool_table_game' value='9 Ball' checked=1>9 Ball</input>
             <input type='radio' name='pool_table_game' value='8 Ball'>8 Ball</input>
             <input type='radio' name='pool_table_game' value='1 Ball'>1 Ball</input>
             <input type='radio' name='pool_table_game' value='0 Ball'>Empty Table</input>
             <input type='radio' name='pool_table_game' value='Rules'>User Guide</input>
             <input type='radio' name='pool_table_game' value='Source'>View Source Code</input>
+        </form></td>
+        <td width=40></td>
+        <td>Player 1:<br><form onclick='set_player_type("player1_type", 0)'>
+            <input type='radio' name='player1_type' value='Human' checked=1>Human</input>
+            <br>
+            <input type='radio' name='player1_type' value='Computer'>Computer</input>
         </form>
+        <td>Player 2:<br><form onclick='set_player_type("player2_type", 1)'>
+            <input type='radio' name='player2_type' value='Human' checked=1>Human</input>
+            <br>
+            <input type='radio' name='player2_type' value='Computer'>Computer</input>
+        </form></td>
+        </tr></table>
+
         <div id="pool_table">Select a game to begin</div>
         <p>
         <hr>
