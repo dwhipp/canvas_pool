@@ -1,6 +1,5 @@
 // The "Ball" class represents a pool ball, and its position and motion on the table
 
-
 function Ball( x, y, radius, color, name ) {
     this.position = new Vector(x,y);
     this.velocity = new Vector(0,0);
@@ -197,5 +196,24 @@ Ball.prototype.is_valid_location = function ( table ) {
     if (this.is_potted( table.pockets )) return false;
 
     return true;
+}
+
+Ball.prototype.blocks_path = function(start, end) {
+  ball_from_origin = this.position.difference(start);
+  end_from_origin = end.difference(start);
+
+  var distance_to_ball = ball_from_origin.magnitude();
+  var distance_to_end = end_from_origin.magnitude();
+
+  if (distance_to_ball > distance_to_end) {
+    return false;
+  }
+
+  var angle_to_ball = ball_from_origin.angle();
+  var angle_to_end = end_from_origin.angle();
+
+  var angle_from_origin = angle_to_ball - angle_to_end;
+  var height = Math.abs(distance_to_ball * Math.sin(angle_from_origin));
+  return height < this.radius * 2;
 }
 

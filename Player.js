@@ -87,8 +87,8 @@ ComputerPlayer.prototype.get_aimpoint = function(legal_balls, cueball_position) 
       var aimpoint = this.get_aimpoint_for_pocket(ball.position, pockets[j].position, ball.radius * 2);
       aimpoint_distance = cueball_position.distance_from(aimpoint);
       var diff = ball_distance - aimpoint_distance;
-      if (diff > best_distance) {
-        aimpoints.push(aimpoint);
+      if (diff > best_distance && !this.path_blocked(cueball_position, aimpoint)) {
+        aimpoints = [ aimpoint ];
         best_distance = diff;
       }
     }
@@ -96,13 +96,26 @@ ComputerPlayer.prototype.get_aimpoint = function(legal_balls, cueball_position) 
 
   if (aimpoints.length == 0) {
     for (var i = 0; i < legal_balls.length; i++) {
-      aimpoints.push(legal_balls[i].position);
+      var offset = polar_vector( Math.random() * legal_balls[i].radius, Math.random() * 2 * Math.PI );
+      aimpoints.push(offset.add(legal_balls[i].position));
     }
   }
 
-
   var index = Math.floor(Math.random() * aimpoints.length);
   return aimpoints[index];
+}
+
+ComputerPlayer.prototype.path_blocked = function(cueball_position, aimpoint) {
+  var table = this.table;
+  var cue_ball = table.cue_ball;
+  var balls = table.balls;
+  for (var i = 0; i < balls.length; i++) {
+    var ball = balls[i];
+    if (ball != cue_ball && ball.blocks_path(cueball_position, aimpoint)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 ComputerPlayer.prototype.set_ball_in_hand_position = function(legal_balls) {
@@ -134,11 +147,12 @@ ComputerPlayer.prototype.begin_shot = function() {
   }
 
   var shot_vector;
-  if (legal_balls.length > 0) {
-    var aimpoint = this.get_aimpoint(legal_balls, table.cue_ball.position);
+  var aimpoint = this.get_aimpoint(legal_balls, table.cue_ball.position);
+  if (aimpoint) {
     var aim = aimpoint.difference(table.cue_ball.position);
     shot_vector = polar_vector( 0.25, aim.angle() + Math.PI );
-  } else {
+  }
+  if (!shot_vector) {
     shot_vector = polar_vector( Math.random(), Math.random() * 2 * Math.PI );
   }
 
