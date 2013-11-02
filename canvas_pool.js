@@ -291,6 +291,11 @@ function init_pool_table(name) {
 
         function draw_fn() {
             table.draw();
+            if (current_game != table.game) {
+              current_game = table.game;
+              set_player_type("player1_type", 0);
+              set_player_type("player2_type", 1);
+            }
             if (table.is_stable() && table.update_id != null) {
                 clearInterval( table.update_id );
                 table.update_id = null;
@@ -300,10 +305,5 @@ function init_pool_table(name) {
         }
 
         draw_id = setInterval( draw_fn, 50 );
-
-        current_game = table.game;
-        set_player_type("player1_type", 0);
-        set_player_type("player2_type", 1);
-        table.player().begin_shot();
     }
 }
