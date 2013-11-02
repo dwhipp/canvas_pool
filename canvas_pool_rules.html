@@ -1,0 +1,107 @@
+<body>
+<h2>Rules and Other Information</h2>
+
+<p>
+This pool-table simulation was created as an exercise to help me learn Javascript
+(and HTML Canvas animations) in November 2009. Please feel free to reuse any parts
+of the code that you find helpful (attribution is appreciated). Note that, because
+it uses the HTML Canvas element, it will not work on all browsers. I&apos;ve so far only
+tested it on Firefox, Safari, and Chrome.
+</p>
+
+<h2>User Interface</h2>
+
+<p>
+The user-interface to this pool table is fairly straight forward:
+</p>
+
+<ul>
+    <li>First, select a game using the buttons at the top of the page: 8-Ball
+    and 9-Ball are games with rules; 1-Ball and &quot;Empty Table&quot; are for practice.
+    </li>
+    <li>You will start out with &quot;ball in hand&quot;: move the cue ball using the mouse,
+    and click to select the position. (If you get the wrong position then hit
+    the &quot;9&quot; key to re-enter &quot;ball in hand&quot; mode)
+    </li>
+    <li>Once the cue ball is positioned, click on it, and hold the button down)
+    to begin your shot. A &quot;cue&quot; should appear (a line stretching back
+    from the ball): move the mouse away from the cue ball to increase the strength.
+    A black bar should appear in the cue to indicate the strength. You can press-and-hold
+    a number from &quot;1&quot; to &quot;7&quot; to modulate the strength-to-distance
+    ratio
+    </li>
+    <li>Release the mouse button to make the shot.
+    </li>
+</ul>
+
+<p>
+
+You will most likely notice that the exact location where you click on the cue
+ball effects the behavior of the ball during the shot. Relative to the direction
+of the shot, hit-locations avoce and below the center will induce forward and
+reverse spin; locations left and right will add size-spin (also known as
+&quot;english&quot;). You you hold the &quot;8&quot; key during the shot then
+this will be magnified.
+</p>
+
+<h2>9-Ball</h2>
+
+<p>
+The rules of 9-ball are simple: every shot, the cue ball must impact the lowest numbered
+ball on the table and, after that impact, some ball must hit a cushion or be potted. If
+you do pot any ball (except the cue ball, which is a foul), then you remain at the table
+for another shot. The first player to pot the 9-ball wins.
+
+</p>
+<p>
+
+If you commit a foul then your opponent gets ball in hand.
+
+</p>
+<p>
+
+The ball numbers are:
+<ul>
+    <li> One ball -- Yellow </li>
+    <li> Two ball -- Blue </li>
+    <li> Three ball -- Red </li>
+    <li> Four ball -- Purple </li>
+    <li> Five ball -- Orange </li>
+    <li> Six ball -- Green </li>
+    <li> Seven ball -- Brown </li>
+    <li> Eight ball -- Black </li>
+    <li> Nine ball -- Gold with white dot </li>
+</ul>
+</p>
+
+<h2>8-Ball</h2>
+
+<p>
+The game of 8-ball has 7 red balls, 7 yellow balls, and a black ball
+(the &quot;Eight Ball&quot;).
+</p>
+
+<p>
+
+The game starts with an open table: the cue ball can hit and pot any ball. The
+first player to pot one or more red or yellow ball will own that color (if you
+pot balls of both color then the table remains open). The other player
+owns the other color. When you own a color, the cue ball must make its first
+impact with a ball of that color.
+
+</p>
+<p>
+
+When you have potted all the balls of the color that you own then you may play
+the eight ball to win the game. If you pot the eight ball at any other time,
+then you lose. Also, you lose if you commit a foul on a shot where you pot the
+eight ball then you lose.
+
+</p>
+
+<h2>1-Ball, and &quot;Empty Table&quot;</h2>
+
+<p>
+These games are for practice: hit the ball(s) anywhere you want.
+</p>
+</body>
