@@ -107,17 +107,24 @@ ComputerPlayer.prototype.get_aimpoint = function(legal_balls, cueball) {
     }
   }
 
-  var aimpoints = [];
-  if (easy.length > 0) {
-    aimpoints = easy;
-  } else if (hard.length > 0) {
-    aimpoints = hard;
-  } else {
+  if (easy.length + hard.length == 0) {
     for (var i = 0; i < legal_balls.length; i++) {
       var offset = polar_vector(
           Math.random() * legal_balls[i].radius, Math.random() * 2 * Math.PI );
-      aimpoints.push(offset.add(legal_balls[i].position));
+      var aimpoint = offset.add(legal_balls[i].position);
+      if (this.path_blocked(legal_balls[i], aimpoint)) {
+        hard.push(aimpoint);
+      } else {
+        easy.push(aimpoint);
+      }
     }
+  }
+
+  var aimpoints = [];
+  if (easy.length > 0) {
+    aimpoints = easy;
+  } else {
+    aimpoints = hard;
   }
 
   var index = Math.floor(Math.random() * aimpoints.length);
