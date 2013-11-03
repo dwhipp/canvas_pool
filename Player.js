@@ -80,6 +80,7 @@ ComputerPlayer.prototype.get_aimpoint = function(legal_balls, cueball) {
 
   var easy = [];
   var hard = [];
+  var hardest = Math.PI / 2;
   for (var i = 0; i < legal_balls.length; i++) {
     var ball = legal_balls[i];
     var ball_distance = cueball.position.distance_from(ball.position);
@@ -92,14 +93,15 @@ ComputerPlayer.prototype.get_aimpoint = function(legal_balls, cueball) {
       var aimpoint_distance = to_aimpoint.magnitude();
 
       if (aimpoint_distance > ball_distance ||
-          this.path_blocked(cueball, cueball.position, aimpoint) ||
-          this.path_blocked(ball, aimpoint, pockets[j].position)) {
+          this.path_blocked(cueball, aimpoint) ||
+          this.path_blocked(ball, pockets[j].position)) {
         // avoid this
       } else if (angular_difficulty < Math.PI / 3 &&
           (pocket_distance < .4 || pocket_distance + aimpoint_distance < 1)) {
         easy.push(aimpoint);
-      } else if (angular_difficulty < Math.PI / 2) {
-        hard.push(aimpoint);
+      } else if (angular_difficulty < hardest) {
+        hardest = angular_difficulty;
+        hard = [aimpoint];
       }
     }
   }
@@ -121,12 +123,12 @@ ComputerPlayer.prototype.get_aimpoint = function(legal_balls, cueball) {
   return aimpoints[index];
 }
 
-ComputerPlayer.prototype.path_blocked = function(object_ball, cueball_position, aimpoint) {
+ComputerPlayer.prototype.path_blocked = function(object_ball, target) {
   var table = this.table;
   var balls = table.balls;
   for (var i = 0; i < balls.length; i++) {
     var ball = balls[i];
-    if (ball != object_ball && ball.blocks_path(cueball_position, aimpoint)) {
+    if (ball != object_ball && ball.blocks_path(object_ball.position, target)) {
       return true;
     }
   }
