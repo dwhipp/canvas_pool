@@ -189,8 +189,8 @@ Ball.prototype.is_valid_location = function ( table ) {
     if ( this.find_overlapping_ball( table.balls ) ) return false;
 
     for (i in table.cushions) {
-	var impact = table.cushions[i].ball_impact_vector(this);
-	if (impact) return false;
+      var impact = table.cushions[i].ball_impact_vector(this);
+      if (impact) return false;
     }
 
     if (this.is_potted( table.pockets )) return false;
