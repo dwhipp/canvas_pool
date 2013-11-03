@@ -214,6 +214,6 @@ Ball.prototype.blocks_path = function(start, end) {
 
   var angle_from_origin = angle_to_ball - angle_to_end;
   var distance_from_path = Math.abs(distance_to_ball * Math.sin(angle_from_origin));
-  return distance_from_path < this.radius * 2.3;
+  return distance_from_path < this.radius * 2;
 }
 

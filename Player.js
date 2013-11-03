@@ -80,15 +80,16 @@ ComputerPlayer.prototype.get_aimpoint = function(legal_balls, cueball) {
 
   var easy = [];
   var hard = [];
-  var hardest = Math.PI / 2;
+  var hardest = 1;
   for (var i = 0; i < legal_balls.length; i++) {
     var ball = legal_balls[i];
     var ball_distance = cueball.position.distance_from(ball.position);
     for (var j = 0; j < pockets.length; j++) {
       var aimpoint = this.get_aimpoint_for_pocket(ball.position, pockets[j].position, ball.radius * 2);
-      var to_aimpoint = cueball.position.difference(aimpoint);
-      var to_pocket = aimpoint.difference(pockets[j].position);
-      var angular_difficulty = Math.abs(to_aimpoint.angle() - to_pocket.angle());
+      var to_aimpoint = aimpoint.difference(cueball.position);
+      var to_pocket = pockets[j].position.difference(ball.position);
+      var diff = to_pocket.unit().difference(to_aimpoint.unit());
+      var angular_difficulty = 2 * Math.abs(diff.angle()) / Math.PI;
       var pocket_distance = to_pocket.distance_from(to_aimpoint);
       var aimpoint_distance = to_aimpoint.magnitude();
 
@@ -96,8 +97,8 @@ ComputerPlayer.prototype.get_aimpoint = function(legal_balls, cueball) {
           this.path_blocked(cueball, aimpoint) ||
           this.path_blocked(ball, pockets[j].position)) {
         // avoid this
-      } else if (angular_difficulty < Math.PI / 3 &&
-          (pocket_distance < .4 || pocket_distance + aimpoint_distance < 1)) {
+      } else if (angular_difficulty < .7 &&
+          (pocket_distance < .3 || pocket_distance + aimpoint_distance < 1)) {
         easy.push(aimpoint);
       } else if (angular_difficulty < hardest) {
         hardest = angular_difficulty;
@@ -139,17 +140,23 @@ ComputerPlayer.prototype.set_ball_in_hand_position = function(legal_balls) {
   var table = this.table;
   var pockets = table.pockets;
   var cue_ball = table.cue_ball;
+  var positions = [];
   for (var i = 0; i < legal_balls.length; i++) {
     var ball = legal_balls[i];
     for (var j = 0; j < pockets.length; j++) {
-      cue_ball.position = this.get_aimpoint_for_pocket(ball.position, pockets[j].position, ball.radius * 3);
+      var position = this.get_aimpoint_for_pocket(
+          ball.position, pockets[j].position, ball.radius * 4);
       if (cue_ball.is_valid_location(table) ) {
-        return;
+        positions.push(position);
       }
     }
   }
-  // Should never get here!
-  cue_ball.position = new Vector(0.75, 0);
+  if (positions.length == 0) {
+    positions = [ new Vector(0.75, 0) ];
+  }
+
+  var index = Math.floor(Math.random() * positions.length);
+  cue_ball.position = positions[index];
 }
 
 ComputerPlayer.prototype.begin_shot = function() {
