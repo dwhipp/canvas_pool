@@ -39,5 +39,12 @@ AddTestGroup('BallTest', {
   test.assertFalse(block2.blocks_path(origin, aim));
 },
 
+"ball to side doesn't block": function(test) {
+  var block = new Ball(-1, 0, 1);
+  var origin = new Vector(0, 0);
+  var aim = new Vector(0, 2);
+  test.assertFalse(block.blocks_path(origin, aim));
+}
+
 
 });

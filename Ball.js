@@ -179,12 +179,17 @@ Ball.prototype.find_overlapping_ball = function ( balls ) {
     return null;
 }
 
-Ball.prototype.is_valid_location = function ( table ) {
+Ball.prototype.is_legal_ball_in_hand_position = function ( table, position ) {
+    if ( ! position ) {
+      position = this.position;
+    }
 
-    if ( this.position.x < -1) return false;
-    if ( this.position.x > +1) return false;
-    if ( this.position.y < -.5) return false;
-    if ( this.position.y > +.5) return false;
+    var bbox = table.legal_ball_in_hand_bounding_box();
+
+    if ( position.x - this.radius < bbox.left) return false;
+    if ( position.x + this.radius > bbox.right) return false;
+    if ( position.y - this.radius < bbox.top) return false;
+    if ( position.y + this.radius > bbox.bottom) return false;
 
     if ( this.find_overlapping_ball( table.balls ) ) return false;
 
@@ -199,13 +204,18 @@ Ball.prototype.is_valid_location = function ( table ) {
 }
 
 Ball.prototype.blocks_path = function(start, end) {
-  ball_from_origin = this.position.difference(start);
-  end_from_origin = end.difference(start);
+  var ball_from_origin = this.position.difference(start);
+  var ball_from_end = this.position.difference(end);
+  var end_from_origin = end.difference(start);
+  var distance_start_to_end = end_from_origin.magnitude();
 
-  var distance_to_ball = ball_from_origin.magnitude();
-  var distance_to_end = end_from_origin.magnitude();
+  var distance_origin_to_ball = ball_from_origin.magnitude();
+  if (distance_origin_to_ball > distance_start_to_end) {
+    return false;
+  }
 
-  if (distance_to_ball > distance_to_end) {
+  var distance_end_to_ball = ball_from_end.magnitude();
+  if (distance_end_to_ball > distance_start_to_end) {
     return false;
   }
 
@@ -213,7 +223,7 @@ Ball.prototype.blocks_path = function(start, end) {
   var angle_to_end = end_from_origin.angle();
 
   var angle_from_origin = angle_to_ball - angle_to_end;
-  var distance_from_path = Math.abs(distance_to_ball * Math.sin(angle_from_origin));
+  var distance_from_path = Math.abs(distance_origin_to_ball * Math.sin(angle_from_origin));
   return distance_from_path < this.radius * 2;
 }
 

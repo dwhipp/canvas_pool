@@ -30,6 +30,7 @@ Table.prototype.initialize = function ( game ) {
     this.cue_ball = new Ball( .5, 0, ball_scale, white, "cue" );
     this.balls.push( this.cue_ball );
     this.ball_in_hand = 1;
+    this.shot_count = 0;
 
     status_message( "game", game );
 
@@ -50,6 +51,14 @@ Table.prototype.initialize = function ( game ) {
     }
 
     this.game.create_balls( ball_scale );
+}
+
+Table.prototype.legal_ball_in_hand_bounding_box = function() {
+  if (this.shot_count == 0) {
+    return { 'left': 0.5 - this.cue_ball.radius, 'right': +1, 'top': -.5, 'bottom' : +.5 };
+  } else {
+    return { 'left': -1, 'right': +1, 'top': -.5, 'bottom' : +.5 };
+  }
 }
 
 Table.prototype.player = function() {
@@ -114,6 +123,7 @@ Table.prototype.commit_shot = function ( point ) {
     if (this.shot) {
         this.shot.commit( point );
         this.shot = null;
+        ++this.shot_count;
         this.do_action();
     }
 }

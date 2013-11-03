@@ -3,6 +3,17 @@
 function Pocket( x, y, radius ) {
     this.position = new Vector(x,y);
     this.radius = radius;
+    if (x > 0) {
+      x -= radius;
+    } else if (x < 0) {
+      x += radius;
+    }
+    if (y > 0) {
+      y -= radius;
+    } else if (y < 0) {
+      y += radius;
+    }
+    this.aimpoint = new Vector(x,y);
 }
 
 Pocket.prototype.draw = function (ctx) {
