@@ -75,22 +75,28 @@ ComputerPlayer.prototype.get_aimpoint_for_pocket = function(ball, pocket, diamet
   return ball.clone().add(ball_to_aimpoint);
 }
 
-ComputerPlayer.prototype.get_aimpoint = function(legal_balls, cueball_position) {
+ComputerPlayer.prototype.get_aimpoint = function(legal_balls, cueball) {
   var pockets = this.table.pockets;
 
   var easy = [];
   var hard = [];
   for (var i = 0; i < legal_balls.length; i++) {
     var ball = legal_balls[i];
-    var ball_distance = cueball_position.distance_from(ball.position);
+    var ball_distance = cueball.position.distance_from(ball.position);
     for (var j = 0; j < pockets.length; j++) {
       var aimpoint = this.get_aimpoint_for_pocket(ball.position, pockets[j].position, ball.radius * 2);
-      var to_aimpoint = cueball_position.difference(aimpoint);
+      var to_aimpoint = cueball.position.difference(aimpoint);
       var to_pocket = aimpoint.difference(pockets[j].position);
       var angular_difficulty = Math.abs(to_aimpoint.angle() - to_pocket.angle());
       var pocket_distance = to_pocket.distance_from(to_aimpoint);
+      var aimpoint_distance = to_aimpoint.magnitude();
 
-      if (angular_difficulty < Math.PI / 4 && pocket_distance < 1) {
+      if (aimpoint_distance > ball_distance ||
+          this.path_blocked(cueball, cueball.position, aimpoint) ||
+          this.path_blocked(ball, aimpoint, pockets[j].position)) {
+        // avoid this
+      } else if (angular_difficulty < Math.PI / 3 &&
+          (pocket_distance < .4 || pocket_distance + aimpoint_distance < 1)) {
         easy.push(aimpoint);
       } else if (angular_difficulty < Math.PI / 2) {
         hard.push(aimpoint);
@@ -105,7 +111,8 @@ ComputerPlayer.prototype.get_aimpoint = function(legal_balls, cueball_position) 
     aimpoints = hard;
   } else {
     for (var i = 0; i < legal_balls.length; i++) {
-      var offset = polar_vector( Math.random() * legal_balls[i].radius, Math.random() * 2 * Math.PI );
+      var offset = polar_vector(
+          Math.random() * legal_balls[i].radius, Math.random() * 2 * Math.PI );
       aimpoints.push(offset.add(legal_balls[i].position));
     }
   }
@@ -114,13 +121,12 @@ ComputerPlayer.prototype.get_aimpoint = function(legal_balls, cueball_position) 
   return aimpoints[index];
 }
 
-ComputerPlayer.prototype.path_blocked = function(cueball_position, aimpoint) {
+ComputerPlayer.prototype.path_blocked = function(object_ball, cueball_position, aimpoint) {
   var table = this.table;
-  var cue_ball = table.cue_ball;
   var balls = table.balls;
   for (var i = 0; i < balls.length; i++) {
     var ball = balls[i];
-    if (ball != cue_ball && ball.blocks_path(cueball_position, aimpoint)) {
+    if (ball != object_ball && ball.blocks_path(cueball_position, aimpoint)) {
       return true;
     }
   }
@@ -156,7 +162,7 @@ ComputerPlayer.prototype.begin_shot = function() {
   }
 
   var shot_vector;
-  var aimpoint = this.get_aimpoint(legal_balls, table.cue_ball.position);
+  var aimpoint = this.get_aimpoint(legal_balls, table.cue_ball);
   if (aimpoint) {
     var aim = aimpoint.difference(table.cue_ball.position);
     shot_vector = polar_vector( 0.25, aim.angle() + Math.PI );

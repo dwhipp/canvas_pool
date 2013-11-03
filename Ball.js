@@ -213,7 +213,7 @@ Ball.prototype.blocks_path = function(start, end) {
   var angle_to_end = end_from_origin.angle();
 
   var angle_from_origin = angle_to_ball - angle_to_end;
-  var height = Math.abs(distance_to_ball * Math.sin(angle_from_origin));
-  return height < this.radius * 2;
+  var distance_from_path = Math.abs(distance_to_ball * Math.sin(angle_from_origin));
+  return distance_from_path < this.radius * 2.3;
 }
 
