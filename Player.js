@@ -101,7 +101,7 @@ ComputerPlayer.prototype.get_aimpoints = function(legal_balls, cueball, has_easy
       // pocket direction -- i.e. impossible. For other angles, the close the
       // object ball is to the pocket, the simpler the shot becomes.
       // The table width is 1.0, and its length 2.0.
-      var difficulty = angular_difficulty * pocket_distance;
+      var difficulty = angular_difficulty * pocket_distance * pocket_distance;
       var cueball_to_object_blocked = this.path_blocked(cueball, aimpoint, ball);
       var object_ball_to_pocket_blocked = this.path_blocked(ball, pockets[j].position);
 
@@ -109,7 +109,7 @@ ComputerPlayer.prototype.get_aimpoints = function(legal_balls, cueball, has_easy
           angular_difficulty > 1.0 ||
           cueball_to_object_blocked || object_ball_to_pocket_blocked) {
         // avoid this
-      } else if (difficulty < .25) {
+      } else if (difficulty < .07) {
         // console.log("easy: ", difficulty, angular_difficulty, pocket_distance);
         easy.push(aimpoint);
       } else if (difficulty < hardest) {
