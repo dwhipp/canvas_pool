@@ -40,6 +40,7 @@ var classes = new Array(
         "Pocket",
         "Polygon",
         "Shot",
+        "ShotCandidate",
         "Table",
         "Vector"
 );

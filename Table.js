@@ -269,3 +269,14 @@ Table.prototype.do_action = function () {
 
 }
 
+Table.prototype.path_blocked = function(ball_at_start, target, ball_at_target) {
+  var balls = this.balls;
+  for (var i = 0; i < balls.length; i++) {
+    var ball = balls[i];
+    if (ball != ball_at_start && ball != ball_at_target &&
+        ball.blocks_path(ball_at_start.position, target)) {
+      return true;
+    }
+  }
+  return false;
+}

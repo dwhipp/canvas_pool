@@ -84,40 +84,15 @@ ComputerPlayer.prototype.get_aimpoints = function(legal_balls, cueball, has_easy
   var hardest = 2;
   for (var i = 0; i < legal_balls.length; i++) {
     var ball = legal_balls[i];
-    var ball_distance = cueball.position.distance_from(ball.position);
     for (var j = 0; j < pockets.length; j++) {
       var aimpoint = this.get_aimpoint_for_pocket(
           ball.position, pockets[j], ball.radius * 2);
-      var to_aimpoint = aimpoint.difference(cueball.position);
-      var to_pocket = pockets[j].position.difference(ball.position);
-      var angle_diff = to_pocket.angle() - to_aimpoint.angle();
-      var angular_difficulty = 2 * Math.abs(angle_diff) / Math.PI;
-      var pocket_distance = to_pocket.distance_from(to_aimpoint);
-      var aimpoint_distance = to_aimpoint.magnitude();
-
-      while (angular_difficulty > 2) angular_difficulty -= 2;
-
-      // Angular difficulty 1.0 implies 90 degrees between cue direction and
-      // pocket direction -- i.e. impossible. For other angles, the close the
-      // object ball is to the pocket, the simpler the shot becomes.
-      // The table width is 1.0, and its length 2.0.
-      var difficulty = angular_difficulty * pocket_distance * pocket_distance;
-      var cueball_to_object_blocked = this.path_blocked(cueball, aimpoint, ball);
-      var object_ball_to_pocket_blocked = this.path_blocked(ball, pockets[j].position);
-
-      if (aimpoint_distance > ball_distance ||
-          angular_difficulty > 1.0 ||
-          cueball_to_object_blocked || object_ball_to_pocket_blocked) {
-        // avoid this
-      } else if (difficulty < .07) {
-        // console.log("easy: ", difficulty, angular_difficulty, pocket_distance);
-        easy.push(aimpoint);
-      } else if (difficulty < hardest) {
-        // console.log("hard: ", difficulty, angular_difficulty, pocket_distance);
+      var candidate = new ShotCandidate(this.table, cueball, aimpoint, ball, pockets[j]);
+      if (candidate.difficulty < 0.7) {
+        easy.push(candidate);
+      } else if (candidate.difficulty < hardest) {
         hardest = difficulty;
-        hard.push(aimpoint);
-      } else {
-        // console.log("harder: ", difficulty, angular_difficulty, pocket_distance);
+        hard.push(candidate);
       }
     }
   }
@@ -132,43 +107,26 @@ ComputerPlayer.prototype.get_aimpoints = function(legal_balls, cueball, has_easy
       var offset = polar_vector(
           Math.random() * ball.radius * 1.9, Math.random() * 2 * Math.PI );
       var aimpoint = offset.add(ball.position);
-      if (this.path_blocked(cueball, aimpoint, ball)) {
-        // console.log("random nasty");
-        if (hard.length < legal_balls.length) {
-          hard.push(aimpoint);
-        }
-      } else {
-        // console.log("random open");
-        if (easy.length < legal_balls.length * 2) {
-          easy.push(aimpoint);
-        } else {
+      var candidate = new ShotCandidate(this.table, cueball, aimpoint, ball, null);
+
+      if (candidate.difficulty < 0.7) {
+        easy.push(candidate);
+        if (easy.length == legal_balls.length * 2) {
           break;
         }
+      } else {
+        hard.push(candidate);
       }
     }
   }
 
-  var aimpoints = [];
   if (easy.length > 0) {
-    aimpoints = easy;
+    return easy;
+  } else if (hard.length > 0) {
+    return hard;
   } else {
-    aimpoints = hard;
+    return null;
   }
-
-  return aimpoints;
-}
-
-ComputerPlayer.prototype.path_blocked = function(ball_at_start, target, ball_at_target) {
-  var table = this.table;
-  var balls = table.balls;
-  for (var i = 0; i < balls.length; i++) {
-    var ball = balls[i];
-    if (ball != ball_at_start && ball != ball_at_target &&
-        ball.blocks_path(ball_at_start.position, target)) {
-      return true;
-    }
-  }
-  return false;
 }
 
 ComputerPlayer.prototype.set_ball_in_hand_position = function(legal_balls) {
@@ -214,11 +172,11 @@ ComputerPlayer.prototype.begin_shot = function() {
     table.ball_in_hand = 0;
   }
 
-  var aimpoints = this.get_aimpoints(legal_balls, table.cue_ball);
+  var shot_candidates = this.get_aimpoints(legal_balls, table.cue_ball);
 
   var shot_vectors = [];
-  for (var i = 0; i < aimpoints.length; i++) {
-    var aim = aimpoints[i].difference(table.cue_ball.position);
+  for (var i = 0; i < shot_candidates.length; i++) {
+    var aim = shot_candidates[i].aimpoint.difference(table.cue_ball.position);
     shot_vectors.push(polar_vector(0.25, aim.angle() + Math.PI));
   }
 
