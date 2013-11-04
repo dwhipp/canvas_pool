@@ -101,7 +101,7 @@ ComputerPlayer.prototype.get_aimpoints = function(legal_balls, cueball, has_easy
       // pocket direction -- i.e. impossible. For other angles, the close the
       // object ball is to the pocket, the simpler the shot becomes.
       // The table width is 1.0, and its length 2.0.
-      var difficulty = angular_difficulty * angular_difficulty * pocket_distance;
+      var difficulty = angular_difficulty * pocket_distance;
       var cueball_to_object_blocked = this.path_blocked(cueball, aimpoint, ball);
       var object_ball_to_pocket_blocked = this.path_blocked(ball, pockets[j].position);
 
@@ -109,13 +109,13 @@ ComputerPlayer.prototype.get_aimpoints = function(legal_balls, cueball, has_easy
           angular_difficulty > 1.0 ||
           cueball_to_object_blocked || object_ball_to_pocket_blocked) {
         // avoid this
-      } else if (difficulty < .09) {
+      } else if (difficulty < .25) {
         // console.log("easy: ", difficulty, angular_difficulty, pocket_distance);
         easy.push(aimpoint);
       } else if (difficulty < hardest) {
         // console.log("hard: ", difficulty, angular_difficulty, pocket_distance);
         hardest = difficulty;
-        hard = [aimpoint];
+        hard.push(aimpoint);
       } else {
         // console.log("harder: ", difficulty, angular_difficulty, pocket_distance);
       }
@@ -237,17 +237,18 @@ ComputerPlayer.prototype.begin_shot = function() {
   }, delay);
 
   var shots_to_show = shot_vectors.length;
-  if (shots_to_show > 1) {
-    shots_to_show *= 2;
-  }
   if (shots_to_show > 5) {
     shots_to_show = 5;
   }
 
-  for (var i = 1; i < shots_to_show; i++) {
-    var shot_vector = shot_vectors[i % shot_vectors.length];
+  function preview_shot(shot_vector) {
     delay += 500;
-    setTimeout(function() { table.adjust_shot(shot_vector.clone()) }, delay);
+    setTimeout(function() {
+      table.adjust_shot(shot_vector.clone()) }, delay);
+  }
+
+  for (var i = 1; i < shots_to_show; i++) {
+    preview_shot(shot_vectors[i % shot_vectors.length]);
   }
 
   var index = Math.floor(Math.random() * shot_vectors.length);
