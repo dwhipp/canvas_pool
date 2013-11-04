@@ -8,6 +8,11 @@ function ShotCandidate(table, cueball, aimpoint, object_ball, pocket) {
   this.pocket = pocket;
 
   this.difficulty = 0;
+  this.strength = 0.25;
+
+  if (!object_ball) {
+    return;
+  }
 
   var cueball_to_object_blocked = table.path_blocked(cueball, aimpoint, object_ball);
   if (cueball_to_object_blocked) {
@@ -38,4 +43,17 @@ function ShotCandidate(table, cueball, aimpoint, object_ball, pocket) {
       cueball_to_object_blocked || object_ball_to_pocket_blocked) {
     this.difficulty = 9999;
   }
+
+  this.strength = aimpoint_distance * 0.2 + pocket_distance * 0.1;
+  this.strength += this.strength * angular_difficulty;
 }
+
+ShotCandidate.prototype.shot_vector = function() {
+  var aim = this.aimpoint.difference(this.cueball.position);
+  var strength = this.strength;
+  if (this.table.shot_count == 0) {
+    strength *= 2;
+  }
+  return aim.unit().scale(strength * -1);
+}
+

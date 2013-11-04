@@ -91,7 +91,7 @@ ComputerPlayer.prototype.get_aimpoints = function(legal_balls, cueball, has_easy
       if (candidate.difficulty < 0.7) {
         easy.push(candidate);
       } else if (candidate.difficulty < hardest) {
-        hardest = difficulty;
+        hardest = candidate.difficulty;
         hard.push(candidate);
       }
     }
@@ -124,9 +124,10 @@ ComputerPlayer.prototype.get_aimpoints = function(legal_balls, cueball, has_easy
     return easy;
   } else if (hard.length > 0) {
     return hard;
-  } else {
-    return null;
   }
+
+  var random_aimpoint = new Vector(Math.random() * 2 - 1, Math.random() - 0.5);
+  return [new ShotCandidate(this.table, cueball, random_aimpoint, null, null)];
 }
 
 ComputerPlayer.prototype.set_ball_in_hand_position = function(legal_balls) {
@@ -176,12 +177,7 @@ ComputerPlayer.prototype.begin_shot = function() {
 
   var shot_vectors = [];
   for (var i = 0; i < shot_candidates.length; i++) {
-    var aim = shot_candidates[i].aimpoint.difference(table.cue_ball.position);
-    shot_vectors.push(polar_vector(0.25, aim.angle() + Math.PI));
-  }
-
-  if (shot_vectors.length == 0) {
-    shot_vectors.push(polar_vector(Math.random(), Math.random() * 2 * Math.PI));
+    shot_vectors.push(shot_candidates[i].shot_vector());
   }
 
   for (var i = 0; i < shot_vectors.length; i++) {
