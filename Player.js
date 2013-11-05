@@ -88,11 +88,11 @@ ComputerPlayer.prototype.get_aimpoints = function(legal_balls, cueball, has_easy
       var aimpoint = this.get_aimpoint_for_pocket(
           ball.position, pockets[j], ball.radius * 2);
       var candidate = new ShotCandidate(this.table, cueball, aimpoint, ball, pockets[j]);
-      if (candidate.difficulty < 0.7) {
+      if (candidate.difficulty < 0.2) {
         easy.push(candidate);
       } else if (candidate.difficulty < hardest) {
         hardest = candidate.difficulty;
-        hard.push(candidate);
+        hard = [ candidate ];
       }
     }
   }
@@ -100,8 +100,10 @@ ComputerPlayer.prototype.get_aimpoints = function(legal_balls, cueball, has_easy
   if (has_easy) {
     return easy.length > 0;
   }
+  var type = "calc";
 
   if (easy.length + hard.length == 0) {
+    type = "random";
     for (var i = 0; i < legal_balls.length * 20; i++) {
       var ball = legal_balls[i % legal_balls.length];
       var offset = polar_vector(
@@ -109,7 +111,7 @@ ComputerPlayer.prototype.get_aimpoints = function(legal_balls, cueball, has_easy
       var aimpoint = offset.add(ball.position);
       var candidate = new ShotCandidate(this.table, cueball, aimpoint, ball, null);
 
-      if (candidate.difficulty < 0.7) {
+      if (candidate.difficulty < 1) {
         easy.push(candidate);
         if (easy.length == legal_balls.length * 2) {
           break;
@@ -121,11 +123,14 @@ ComputerPlayer.prototype.get_aimpoints = function(legal_balls, cueball, has_easy
   }
 
   if (easy.length > 0) {
+        console.log("EASY: ", type, easy);
     return easy;
   } else if (hard.length > 0) {
+        console.log("HARD: ", type, hard);
     return hard;
   }
 
+  console.log("RANDOM: ", candidate.difficulty);
   var random_aimpoint = new Vector(Math.random() * 2 - 1, Math.random() - 0.5);
   return [new ShotCandidate(this.table, cueball, random_aimpoint, null, null)];
 }
