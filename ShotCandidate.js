@@ -48,6 +48,14 @@ function ShotCandidate(table, cueball, aimpoint, object_ball, pocket) {
       this.pocket_distance * 0.15 * Math.pow(1.6, this.angular_difficulty);
 }
 
+ShotCandidate.prototype.is_easy = function() {
+  return this.difficulty < 0.2;
+}
+
+ShotCandidate.prototype.is_possible = function() {
+  return this.difficulty < 10;
+}
+
 ShotCandidate.prototype.shot_vector = function() {
   var aim = this.aimpoint.difference(this.cueball.position);
   var strength = this.strength;
@@ -57,3 +65,6 @@ ShotCandidate.prototype.shot_vector = function() {
   return aim.unit().scale(strength * -1);
 }
 
+ShotCandidate.sort_by_difficulty = function(a,b) {
+  return a.difficulty - b.difficulty
+}

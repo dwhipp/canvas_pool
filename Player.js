@@ -76,58 +76,83 @@ ComputerPlayer.prototype.get_aimpoint_for_pocket = function(ball_position, pocke
   return ball_to_aimpoint.add(ball_position);
 }
 
-ComputerPlayer.prototype.get_aimpoints = function(legal_balls, cueball, has_easy) {
+ComputerPlayer.prototype.get_direct_shots = function(legal_balls, cueball) {
   var pockets = this.table.pockets;
-
-  var easy = [];
-  var hard = [];
-  var hardest = 2;
+  var candidates = [];
   for (var i = 0; i < legal_balls.length; i++) {
     var ball = legal_balls[i];
     for (var j = 0; j < pockets.length; j++) {
-      var aimpoint = this.get_aimpoint_for_pocket(
-          ball.position, pockets[j], ball.radius * 2);
-      var candidate = new ShotCandidate(this.table, cueball, aimpoint, ball, pockets[j]);
-      if (candidate.difficulty < 0.2) {
-        easy.push(candidate);
-      } else if (candidate.difficulty < hardest) {
-        hardest = candidate.difficulty;
-        hard = [ candidate ];
+      var pocket = pockets[j];
+      var aimpoint = this.get_aimpoint_for_pocket(ball.position, pocket, ball.radius * 2);
+      var candidate = new ShotCandidate(this.table, cueball, aimpoint, ball, pocket);
+      if (candidate.is_possible()) {
+        candidates.push(candidate);
       }
     }
   }
+  return candidates;
+}
+
+ComputerPlayer.prototype.get_random_shots = function(legal_balls, cueball, count) {
+  var candidates = [];
+  for (var i = 0; i < count; i++) {
+    var ball = legal_balls[i % legal_balls.length];
+    var offset = polar_vector(
+        Math.random() * ball.radius * 1.9, Math.random() * 2 * Math.PI );
+    var aimpoint = offset.add(ball.position);
+    var candidate = new ShotCandidate(this.table, cueball, aimpoint, ball, null);
+    if (candidate.is_possible()) {
+      candidates.push(candidate);
+    }
+  }
+  return candidates;
+}
+
+ComputerPlayer.prototype.partition_candidates = function(candidates, is_easy_fn) {
+  var easy = [];
+  var hard = [];
+
+  for (var i = 0; i < candidates.length; ++i)  {
+    if (is_easy_fn(candidates[i])) {
+      easy.push(candidates[i]);
+    } else {
+      hard.push(candidates[i]);
+    }
+  }
+
+  return {'easy': easy, 'hard' : hard};
+}
+
+ComputerPlayer.prototype.get_aimpoints = function(legal_balls, cueball, has_easy) {
+  var candidates = this.get_direct_shots(legal_balls, cueball);
+
+  candidates.sort(ShotCandidate.sort_by_difficulty);
 
   if (has_easy) {
-    return easy.length > 0;
+    return candidates.length != 0 && candidates[0].is_easy();
   }
-  var type = "calc";
 
-  if (easy.length + hard.length == 0) {
-    type = "random";
-    for (var i = 0; i < legal_balls.length * 20; i++) {
-      var ball = legal_balls[i % legal_balls.length];
-      var offset = polar_vector(
-          Math.random() * ball.radius * 1.9, Math.random() * 2 * Math.PI );
-      var aimpoint = offset.add(ball.position);
-      var candidate = new ShotCandidate(this.table, cueball, aimpoint, ball, null);
+  if (candidates.length > 0) {
+    var partitions = this.partition_candidates(candidates, function(a){return a.is_easy()});
+    console.log("Candidates: ", partitions.easy.length, candidates);
 
-      if (candidate.difficulty < 1) {
-        easy.push(candidate);
-        if (easy.length == legal_balls.length * 2) {
-          break;
-        }
-      } else {
-        hard.push(candidate);
-      }
+    if (partitions.easy.length > 0) {
+      return partitions.easy;
+    }
+    if (partitions.hard.length > 0) {
+      return [ partitions.hard[0] ];
     }
   }
 
-  if (easy.length > 0) {
-        console.log("EASY: ", type, easy);
-    return easy;
-  } else if (hard.length > 0) {
-        console.log("HARD: ", type, hard);
-    return hard;
+  candidates = this.get_random_shots(legal_balls, cueball, legal_balls.length * 20);
+  var partitions = this.partition_candidates(
+      candidates, function(a){return a.difficulty < 1});
+
+  if (partitions.easy.length > 0) {
+    return partitions.easy;
+  }
+  if (partitions.hard.length > 0) {
+    return partitions.hard;
   }
 
   console.log("RANDOM: ", candidate.difficulty);
