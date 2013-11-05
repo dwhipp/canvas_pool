@@ -44,7 +44,7 @@ function ShotCandidate(table, cueball, aimpoint, object_ball, pocket) {
     this.difficulty = 9999;
   }
 
-  this.strength = aimpoint_distance * 0.2 + pocket_distance * 0.1;
+  this.strength = aimpoint_distance * 0.15 + pocket_distance * 0.12;
   this.strength += this.strength * angular_difficulty;
 }
 
