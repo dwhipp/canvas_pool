@@ -14,9 +14,15 @@ function ShotCandidate(table, cueball, aimpoint, object_ball, pocket) {
     return;
   }
 
-  var cueball_to_object_blocked = table.path_blocked(cueball, aimpoint, object_ball);
+  var cueball_to_object_blocked = table.path_blocked(
+      cueball, cueball.position, aimpoint, object_ball);
   if (cueball_to_object_blocked) {
     this.difficulty = 9999;
+    return;
+  }
+
+  if (table.collision_would_pot_cueball(cueball, aimpoint, object_ball)) {
+    this.difficulty = 9998;
     return;
   }
 
@@ -35,7 +41,8 @@ function ShotCandidate(table, cueball, aimpoint, object_ball, pocket) {
   // object ball is to the pocket, the simpler the shot becomes.
   // The table width is 1.0, and its length 2.0.
   this.difficulty = this.angular_difficulty * this.pocket_distance * this.pocket_distance;
-  var object_ball_to_pocket_blocked = table.path_blocked(object_ball, pocket.aimpoint);
+  var object_ball_to_pocket_blocked = table.path_blocked(
+      object_ball, object_ball.position, pocket.aimpoint);
   var ball_distance = cueball.position.distance_from(object_ball.position);
 
   if (this.aimpoint_distance > ball_distance ||
@@ -46,6 +53,10 @@ function ShotCandidate(table, cueball, aimpoint, object_ball, pocket) {
 
   this.strength = this.aimpoint_distance * 0.15 +
       this.pocket_distance * 0.15 * Math.pow(1.6, this.angular_difficulty);
+}
+
+ShotCandidate.sort_by_difficulty = function(a,b) {
+  return a.difficulty - b.difficulty
 }
 
 ShotCandidate.prototype.is_easy = function() {
@@ -63,8 +74,4 @@ ShotCandidate.prototype.shot_vector = function() {
     strength = 0.8;
   }
   return aim.unit().scale(strength * -1);
-}
-
-ShotCandidate.sort_by_difficulty = function(a,b) {
-  return a.difficulty - b.difficulty
 }

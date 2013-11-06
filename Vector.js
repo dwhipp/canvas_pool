@@ -92,3 +92,34 @@ Vector.prototype.difference = function(other) {
 Vector.prototype.distance_from = function(other) {
     return this.difference(other).magnitude();
 }
+
+Vector.prototype.reflect_off = function(other) {
+  return other.clone()
+    .scale(2 * this.dot_product(other) / other.squared())
+    .subtract(this);
+}
+
+Vector.prototype.distance_from_line = function(start, end) {
+  var from_start = this.difference(start);
+  var from_end = this.difference(end);
+  var start_to_end = end.difference(start);
+
+  var distance_start_to_end = start_to_end.magnitude();
+  var distance_from_start = from_start.magnitude();
+  var distance_from_end = from_end.magnitude();
+
+  if (distance_from_start > distance_start_to_end) {
+    if (distance_from_end > distance_start_to_end) {
+      return Math.min(distance_from_end, distance_start_to_end);
+    }
+  }
+  if (distance_from_end > distance_start_to_end) {
+    return distance_from_end;
+  }
+
+  var angle_from_this = from_start.angle();
+  var angle_to_end = start_to_end.angle();
+  var angle_from_start = angle_from_this - angle_to_end;
+  return Math.abs(distance_from_start * Math.sin(angle_from_start));
+}
+

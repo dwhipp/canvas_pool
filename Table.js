@@ -269,14 +269,37 @@ Table.prototype.do_action = function () {
 
 }
 
-Table.prototype.path_blocked = function(ball_at_start, target, ball_at_target) {
+Table.prototype.path_blocked = function(ball_at_start, start_position, target, ball_at_target) {
   var balls = this.balls;
   for (var i = 0; i < balls.length; i++) {
     var ball = balls[i];
     if (ball != ball_at_start && ball != ball_at_target &&
-        ball.blocks_path(ball_at_start.position, target)) {
+        ball.blocks_path(start_position, target)) {
       return true;
     }
   }
   return false;
 }
+
+Table.prototype.collision_would_pot_cueball = function(cueball, aimpoint, object_ball) {
+  var cueball_to_aimpoint = aimpoint.difference(cueball.position).unit();
+  var aimpoint_to_object_ball = object_ball.position.difference(aimpoint);
+  var collision_normal = aimpoint_to_object_ball.unit().normal();
+  var rebound = cueball_to_aimpoint.reflect_off(collision_normal);
+
+  if (this.path_blocked(object_ball, aimpoint, rebound)) {
+    return false;
+  }
+
+  var pockets = this.pockets;
+  for (var i = 0; i < pockets.length; i++) {
+    var pocket = pockets[i];
+    var distance_from_pocket = pocket.position.distance_from_line(aimpoint, rebound);
+    var safe_distance = pocket.radius + object_ball.radius;
+    if (distance_from_pocket < safe_distance * 2) {
+      return true;
+    }
+  }
+  return false;
+}
+

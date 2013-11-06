@@ -204,26 +204,6 @@ Ball.prototype.is_legal_ball_in_hand_position = function ( table, position ) {
 }
 
 Ball.prototype.blocks_path = function(start, end) {
-  var ball_from_origin = this.position.difference(start);
-  var ball_from_end = this.position.difference(end);
-  var end_from_origin = end.difference(start);
-  var distance_start_to_end = end_from_origin.magnitude();
-
-  var distance_origin_to_ball = ball_from_origin.magnitude();
-  if (distance_origin_to_ball > distance_start_to_end) {
-    return false;
-  }
-
-  var distance_end_to_ball = ball_from_end.magnitude();
-  if (distance_end_to_ball > distance_start_to_end) {
-    return false;
-  }
-
-  var angle_to_ball = ball_from_origin.angle();
-  var angle_to_end = end_from_origin.angle();
-
-  var angle_from_origin = angle_to_ball - angle_to_end;
-  var distance_from_path = Math.abs(distance_origin_to_ball * Math.sin(angle_from_origin));
-  return distance_from_path < this.radius * 2;
+  return this.position.distance_from_line(start, end) < this.radius * 2;
 }
 

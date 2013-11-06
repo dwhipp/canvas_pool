@@ -95,4 +95,12 @@ AddTestGroup('VectorTest', {
   test.assertEquals(5, v1.distance_from(v2));
 },
 
+'reflection' : function(test) {
+  var v1 = new Vector(1, -1);
+  var v2 = new Vector(1, 0);
+  var reflection = v1.reflect_off(v2);
+  var expect = new Vector(1, 1);
+  test.assertDotEquals(expect, reflection);
+},
+
 });
