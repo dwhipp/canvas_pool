@@ -15,6 +15,10 @@ Ball.prototype.is_stable = function () {
     return this.velocity.is_null() && this.spin.is_null();
 }
 
+Ball.prototype.set_position = function (base, offset_x, offset_y) {
+  this.position = new Vector(offset_x, offset_y).scale(this.radius).add(base);
+}
+
 Ball.prototype.draw = function (ctx) {
     ctx.save();
     ctx.fillStyle = this.color;
@@ -204,6 +208,7 @@ Ball.prototype.is_legal_ball_in_hand_position = function ( table, position ) {
 }
 
 Ball.prototype.blocks_path = function(start, end) {
-  return this.position.distance_from_line(start, end) < this.radius * 2;
+  var distance = this.position.distance_from_line(start, end);
+  return distance != null && distance < this.radius * 2;
 }
 

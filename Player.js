@@ -19,6 +19,7 @@ Player.prototype.mouse_up = function(vec) {}
 Player.prototype.mouse_move = function(vec) {}
 
 Player.prototype.begin_shot = function() {
+  this.game.force_position_for_testing();
   // console.log("BEGIN: " + this.name);
 }
 
@@ -144,7 +145,8 @@ ComputerPlayer.prototype.get_shot_condidates = function(legal_balls, cueball, ha
     }
   }
 
-  candidates = this.get_random_shots(legal_balls, cueball, legal_balls.length * 20);
+  candidates = this.get_random_shots(
+      legal_balls, cueball, legal_balls.length * 20);
   var partitions = this.partition_candidates(
       candidates, function(a){return a.difficulty < 1});
 
@@ -195,6 +197,8 @@ ComputerPlayer.prototype.begin_shot = function() {
   var table = this.table;
   var game = this.game;
 
+  game.force_position_for_testing();
+
   var legal_balls = this.game.legal_balls(this);
   // console.log("BEGIN COMPUTER SHOT");
 
@@ -237,9 +241,16 @@ ComputerPlayer.prototype.begin_shot = function() {
 
   var index = Math.floor(Math.random() * shot_vectors.length);
   var shot_vector = shot_vectors[index].clone();
+  console.log(shot_candidates[index]);
 
   delay += 500;
-  setTimeout(function() { table.adjust_shot(shot_vector.clone()) }, delay);
-  delay += 500;
-  setTimeout(function() { table.commit_shot(shot_vector.clone()) }, delay);
+  setTimeout(function() {
+    table.adjust_shot(shot_vector.clone());
+    table.shot_candidate = shot_candidates[index];
+  }, delay);
+  delay += 1000;
+  setTimeout(function() {
+    table.commit_shot(shot_vector.clone());
+    table.shot_candidate = null;
+  }, delay);
 }

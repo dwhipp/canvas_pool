@@ -37,11 +37,12 @@ Game.prototype.player = function() {
 }
 
 Game.prototype.legal_balls = function(player) {
-  var legal = [];
   var balls = this.table.balls;
+  var cue_ball = this.table.cue_ball;
+  var legal = [];
   for (i in balls) {
     var ball = balls[i];
-    if (ball.name != 'cue') {
+    if (ball != cue_ball) {
       legal.push(ball);
     }
   }
@@ -174,13 +175,15 @@ Game.prototype.shot_complete = function () {
 
 }
 
-function Game_1ball( table ) { Game_ctor( this, "Practice", table ); }
 function Game_0ball( table ) { Game_ctor( this, "Empty Table", table ); }
+function Game_1ball( table ) { Game_ctor( this, "Practice", table ); }
+function Game_2ball( table ) { Game_ctor( this, "2 Ball", table ); }
 function Game_8ball( table ) { Game_ctor( this, "8 Ball", table ); }
 function Game_9ball( table ) { Game_ctor( this, "9 Ball", table ); }
 
 Game_9ball.prototype = new Game();
 Game_8ball.prototype = new Game();
+Game_2ball.prototype = new Game();
 Game_1ball.prototype = new Game();
 Game_0ball.prototype = new Game();
 
@@ -208,6 +211,11 @@ Game_8ball.prototype.create_balls = function ( radius ) {
 
 Game_1ball.prototype.create_balls = function ( radius ) {
     this.create_ball( 0, 0, yellow, "object" );
+}
+
+Game_2ball.prototype.create_balls = function ( radius ) {
+    this.create_ball( 2, 2, red, "red" );
+    this.create_ball( 2, -2, yellow, "yellow" );
 }
 
 Game_9ball.prototype.create_balls = function ( radius ) {
@@ -367,7 +375,6 @@ Game_8ball.prototype.legal_balls = function(player) {
 }
 
 Game_8ball.prototype.shot_complete = function () {
-
     var error = this.get_shot_error();
     var table = this.table;
     var potted_8ball = false;
@@ -446,14 +453,29 @@ Game_8ball.prototype.shot_complete = function () {
 
 
 Game_1ball.prototype.shot_complete = function () {
-    var table = this.table;
-    if (this.potted_cue_ball) {
-        var cue_ball = table.cue_ball;
-        table.balls.push( cue_ball );
-        table.ball_in_hand = 1;
-    }
-    this.replace_potted_balls();
-    this.replace_off_table_balls();
-    this.current_player = 1 - this.current_player;
+  var table = this.table;
+  if (this.potted_cue_ball) {
+    var cue_ball = table.cue_ball;
+    table.balls.push( cue_ball );
+    table.ball_in_hand = 1;
+  }
+  this.replace_potted_balls();
+  this.replace_off_table_balls();
+  this.current_player = 1 - this.current_player;
+
+  var player = this.players[ this.current_player ];
+  status_message( "To Shoot: ", player.name );
 }
 
+Game_2ball.prototype.shot_complete = Game_1ball.prototype.shot_complete;
+
+Game.prototype.force_position_for_testing = function() {}
+
+Game_1ball.prototype.force_position_for_testing = function() {
+  var table = this.table;
+  var pocket = table.get_pocket_by_position(0, -.5);
+  var base = pocket.aimpoint;
+  table.get_ball_by_name('object').set_position(base, -1.3, 3);
+  table.get_ball_by_name('cue').set_position(base, 2, 4);
+  table.ball_in_hand = 0;
+}

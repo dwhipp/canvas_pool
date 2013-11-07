@@ -40,6 +40,9 @@ Table.prototype.initialize = function ( game ) {
     else if (game == "8 Ball") {
         this.game = new Game_8ball( this );
     }
+    else if (game == "2 Ball") {
+        this.game = new Game_2ball( this );
+    }
     else if (game == "1 Ball") {
         this.game = new Game_1ball( this );
     }
@@ -63,6 +66,29 @@ Table.prototype.legal_ball_in_hand_bounding_box = function() {
 
 Table.prototype.player = function() {
   return this.game.player();
+}
+
+Table.prototype.get_ball_by_name = function(name, count) {
+  if (!count) count = 1;
+  for (var i = 0; i < this.balls.length; i++) {
+    if (this.balls[i].name == name) {
+      if (--count == 0) {
+        return this.balls[i];
+      }
+    }
+  }
+  return null;
+}
+
+Table.prototype.get_pocket_by_position = function(x, y, distance) {
+  var point = new Vector(x, y);
+  for (var i = 0; i < this.pockets.length; i++) {
+    var pocket = this.pockets[i];
+    if (point.distance_from(pocket.position) < (distance ? distance : pocket.radius)) {
+      return pocket;
+    }
+  }
+  return null;
 }
 
 Table.prototype.replace_ball = function ( ball ) {
@@ -193,6 +219,10 @@ Table.prototype.draw = function () {
     if (this.shot) {
         this.shot.draw( ctx );
     }
+
+    if (this.shot_candidate) {
+      this.shot_candidate.draw( ctx );
+    }
 }
 
 Table.prototype.update = function () {
@@ -281,22 +311,25 @@ Table.prototype.path_blocked = function(ball_at_start, start_position, target, b
   return false;
 }
 
-Table.prototype.collision_would_pot_cueball = function(cueball, aimpoint, object_ball) {
-  var cueball_to_aimpoint = aimpoint.difference(cueball.position).unit();
-  var aimpoint_to_object_ball = object_ball.position.difference(aimpoint);
-  var collision_normal = aimpoint_to_object_ball.unit().normal();
-  var rebound = cueball_to_aimpoint.reflect_off(collision_normal);
+Table.prototype.collision_would_pot_cueball = function(shot_candidate) {
+  var cueball = shot_candidate.cueball;
+  var aimpoint = shot_candidate.aimpoint;
+  var object_ball = shot_candidate.object_ball;
+  var final_destination = shot_candidate.final_destination;
 
-  if (this.path_blocked(object_ball, aimpoint, rebound)) {
+  if (this.path_blocked(object_ball, aimpoint, final_destination, cueball)) {
     return false;
   }
 
   var pockets = this.pockets;
   for (var i = 0; i < pockets.length; i++) {
     var pocket = pockets[i];
-    var distance_from_pocket = pocket.position.distance_from_line(aimpoint, rebound);
-    var safe_distance = pocket.radius + object_ball.radius;
-    if (distance_from_pocket < safe_distance * 2) {
+    var safe_distance = pocket.radius;
+    var distance_from_pocket = Math.min(
+        pocket.position.distance_from_line(aimpoint, final_destination),
+        pocket.aimpoint.distance_from_line(aimpoint, final_destination));
+    if (distance_from_pocket < safe_distance) {
+      shot_candidate.in_off_pocket = pocket.position;
       return true;
     }
   }

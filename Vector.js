@@ -108,13 +108,9 @@ Vector.prototype.distance_from_line = function(start, end) {
   var distance_from_start = from_start.magnitude();
   var distance_from_end = from_end.magnitude();
 
-  if (distance_from_start > distance_start_to_end) {
-    if (distance_from_end > distance_start_to_end) {
-      return Math.min(distance_from_end, distance_start_to_end);
-    }
-  }
-  if (distance_from_end > distance_start_to_end) {
-    return distance_from_end;
+  if (distance_from_start > distance_start_to_end ||
+      distance_from_end > distance_start_to_end) {
+    return null;
   }
 
   var angle_from_this = from_start.angle();

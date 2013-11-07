@@ -14,25 +14,38 @@ function ShotCandidate(table, cueball, aimpoint, object_ball, pocket) {
     return;
   }
 
+  this.cueball_to_aimpoint = aimpoint.difference(cueball.position);
+  this.aimpoint_to_object_ball = object_ball.position.difference(aimpoint);
+  this.collision_tangent = this.aimpoint_to_object_ball.normal();
+  this.final_destination = this.collision_tangent.unit().add(aimpoint);
+
   var cueball_to_object_blocked = table.path_blocked(
       cueball, cueball.position, aimpoint, object_ball);
+
   if (cueball_to_object_blocked) {
     this.difficulty = 9999;
     return;
   }
 
-  if (table.collision_would_pot_cueball(cueball, aimpoint, object_ball)) {
+  var to_aimpoint = this.cueball_to_aimpoint;
+  this.aimpoint_distance = to_aimpoint.magnitude();
+  var ball_distance = cueball.position.distance_from(object_ball.position);
+
+  if (this.aimpoint_distance > ball_distance) {
     this.difficulty = 9998;
     return;
   }
 
-  if (!pocket) return;
+  if (!pocket)  {
+    if (table.collision_would_pot_cueball(this)) {
+      this.difficulty = 9997;
+    }
+    return;
+  }
 
-  var to_aimpoint = aimpoint.difference(cueball.position);
   var to_pocket = pocket.position.difference(object_ball.position);
   this.angle_diff = to_pocket.angle() - to_aimpoint.angle();
   this.pocket_distance = to_pocket.distance_from(to_aimpoint);
-  this.aimpoint_distance = to_aimpoint.magnitude();
   this.angular_difficulty = 2 * Math.abs(this.angle_diff) / Math.PI;
   while (this.angular_difficulty > 2) this.angular_difficulty -= 2;
 
@@ -43,12 +56,12 @@ function ShotCandidate(table, cueball, aimpoint, object_ball, pocket) {
   this.difficulty = this.angular_difficulty * this.pocket_distance * this.pocket_distance;
   var object_ball_to_pocket_blocked = table.path_blocked(
       object_ball, object_ball.position, pocket.aimpoint);
-  var ball_distance = cueball.position.distance_from(object_ball.position);
 
-  if (this.aimpoint_distance > ball_distance ||
-      this.angular_difficulty > 1.0 ||
+  if (this.angular_difficulty > 1.0 ||
       cueball_to_object_blocked || object_ball_to_pocket_blocked) {
-    this.difficulty = 999;
+    this.difficulty = 9996;
+  } else if (table.collision_would_pot_cueball(this)) {
+    this.difficulty = 9995;
   }
 
   this.strength = this.aimpoint_distance * 0.15 +
@@ -74,4 +87,29 @@ ShotCandidate.prototype.shot_vector = function() {
     strength = 0.8;
   }
   return aim.unit().scale(strength * -1);
+}
+
+ShotCandidate.prototype.draw = function(ctx) {
+  var aim = this.aimpoint;
+
+  if (!aim) return;
+
+  ctx.strokeStyle = black;
+  ctx.lineWidth = 0.003;
+  ctx.beginPath();
+  ctx.arc( aim.x, aim.y, this.cueball.radius, 0, Math.PI*2, true );
+  ctx.closePath();
+  ctx.stroke();
+
+  var end = this.final_destination;
+  if (!end) return;
+
+  ctx.strokeStyle = black;
+  ctx.lineWidth = 0.003;
+  ctx.beginPath();
+  ctx.moveTo(aim.x,aim.y);
+  ctx.lineTo(end.x,end.y);
+  ctx.closePath();
+  ctx.stroke();
+
 }
