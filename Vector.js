@@ -84,7 +84,6 @@ Vector.prototype.unit = function () {
 Vector.prototype.normal = function () {
     return new Vector( -this.y, this.x );
 }
-
 Vector.prototype.difference = function(other) {
     return this.clone().subtract( other );
 }

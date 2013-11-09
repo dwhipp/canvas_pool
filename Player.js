@@ -229,25 +229,23 @@ ComputerPlayer.prototype.begin_shot = function() {
     shots_to_show = 5;
   }
 
-  function preview_shot(shot_vector) {
+  function preview_shot(index) {
     delay += 500;
     setTimeout(function() {
-      table.adjust_shot(shot_vector.clone()) }, delay);
+      table.shot_candidate = shot_candidates[index];
+      table.adjust_shot(shot_vectors[index].clone()) }, delay);
   }
 
   for (var i = 1; i < shots_to_show; i++) {
-    preview_shot(shot_vectors[i % shot_vectors.length]);
+    preview_shot(i % shot_vectors.length);
   }
 
   var index = Math.floor(Math.random() * shot_vectors.length);
   var shot_vector = shot_vectors[index].clone();
   console.log(shot_candidates[index]);
 
-  delay += 500;
-  setTimeout(function() {
-    table.adjust_shot(shot_vector.clone());
-    table.shot_candidate = shot_candidates[index];
-  }, delay);
+  preview_shot(index);
+
   delay += 1000;
   setTimeout(function() {
     table.commit_shot(shot_vector.clone());

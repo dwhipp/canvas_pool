@@ -471,6 +471,7 @@ Game_2ball.prototype.shot_complete = Game_1ball.prototype.shot_complete;
 
 Game.prototype.force_position_for_testing = function() {}
 
+/*
 Game_1ball.prototype.force_position_for_testing = function() {
   var table = this.table;
   var pocket = table.get_pocket_by_position(0, -.5);
@@ -479,3 +480,4 @@ Game_1ball.prototype.force_position_for_testing = function() {
   table.get_ball_by_name('cue').set_position(base, 2, 4);
   table.ball_in_hand = 0;
 }
+*/

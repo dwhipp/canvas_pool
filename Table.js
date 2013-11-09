@@ -323,13 +323,7 @@ Table.prototype.collision_would_pot_cueball = function(shot_candidate) {
 
   var pockets = this.pockets;
   for (var i = 0; i < pockets.length; i++) {
-    var pocket = pockets[i];
-    var safe_distance = pocket.radius;
-    var distance_from_pocket = Math.min(
-        pocket.position.distance_from_line(aimpoint, final_destination),
-        pocket.aimpoint.distance_from_line(aimpoint, final_destination));
-    if (distance_from_pocket < safe_distance) {
-      shot_candidate.in_off_pocket = pocket.position;
+    if (pockets[i].shot_would_pot_cueball(shot_candidate)) {
       return true;
     }
   }

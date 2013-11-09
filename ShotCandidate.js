@@ -16,8 +16,11 @@ function ShotCandidate(table, cueball, aimpoint, object_ball, pocket) {
 
   this.cueball_to_aimpoint = aimpoint.difference(cueball.position);
   this.aimpoint_to_object_ball = object_ball.position.difference(aimpoint);
-  this.collision_tangent = this.aimpoint_to_object_ball.normal();
-  this.final_destination = this.collision_tangent.unit().add(aimpoint);
+  this.collision_tangent = this.aimpoint_to_object_ball.normal().unit();
+  this.collision_tangent.scale(
+      this.collision_tangent.dot_product(this.cueball_to_aimpoint.unit()));
+
+  this.final_destination = this.collision_tangent.add(aimpoint);
 
   var cueball_to_object_blocked = table.path_blocked(
       cueball, cueball.position, aimpoint, object_ball);
@@ -91,10 +94,8 @@ ShotCandidate.prototype.shot_vector = function() {
 
 ShotCandidate.prototype.draw = function(ctx) {
   var aim = this.aimpoint;
-
   if (!aim) return;
-
-  ctx.strokeStyle = black;
+  ctx.strokeStyle = gray;
   ctx.lineWidth = 0.003;
   ctx.beginPath();
   ctx.arc( aim.x, aim.y, this.cueball.radius, 0, Math.PI*2, true );
@@ -103,13 +104,9 @@ ShotCandidate.prototype.draw = function(ctx) {
 
   var end = this.final_destination;
   if (!end) return;
-
-  ctx.strokeStyle = black;
-  ctx.lineWidth = 0.003;
   ctx.beginPath();
   ctx.moveTo(aim.x,aim.y);
   ctx.lineTo(end.x,end.y);
   ctx.closePath();
   ctx.stroke();
-
 }
