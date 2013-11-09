@@ -94,6 +94,10 @@ ComputerPlayer.prototype.get_direct_shots = function(legal_balls, cueball) {
   return candidates;
 }
 
+ComputerPlayer.prototype.get_cushion_shots = function(legal_balls, cueball) {
+  return [];
+}
+
 ComputerPlayer.prototype.get_random_shots = function(legal_balls, cueball, count) {
   var candidates = [];
   for (var i = 0; i < count; i++) {
@@ -109,19 +113,16 @@ ComputerPlayer.prototype.get_random_shots = function(legal_balls, cueball, count
   return candidates;
 }
 
-ComputerPlayer.prototype.partition_candidates = function(candidates, is_easy_fn) {
-  var easy = [];
-  var hard = [];
+ComputerPlayer.prototype.grep_candidates = function(candidates, match_fn) {
+  var match = [];
 
   for (var i = 0; i < candidates.length; ++i)  {
-    if (is_easy_fn(candidates[i])) {
-      easy.push(candidates[i]);
-    } else {
-      hard.push(candidates[i]);
+    if (match_fn(candidates[i])) {
+      match.push(candidates[i]);
     }
   }
 
-  return {'easy': easy, 'hard' : hard};
+  return match;
 }
 
 ComputerPlayer.prototype.get_shot_condidates = function(legal_balls, cueball, has_easy) {
@@ -134,27 +135,38 @@ ComputerPlayer.prototype.get_shot_condidates = function(legal_balls, cueball, ha
   }
 
   if (candidates.length > 0) {
-    var partitions = this.partition_candidates(candidates, function(a){return a.is_easy()});
-    console.log("Candidates: ", partitions.easy.length, candidates);
+    var easy = this.grep_candidates(
+        candidates, function(candidate) {return candidate.is_easy()});
+    console.log("Candidates: ", easy.length, candidates);
 
-    if (partitions.easy.length > 0) {
-      return partitions.easy;
+    if (easy.length > 0) {
+      return easy;
     }
-    if (partitions.hard.length > 0) {
-      return [ partitions.hard[0] ];
+    candidates = [ candidates[0] ];
+  }
+
+  candidates.concat(this.get_cushion_shots(legal_balls, cueball));
+
+  if (candidates.length > 0) {
+    var easy = this.grep_candidates(
+        candidates, function(candidate) {return candidate.difficulty < 1});
+    if (easy.length > 0) {
+      return easy;
     }
+    candidates.sort(ShotCandidate.sort_by_difficulty);
+    return candidates[0];
   }
 
   candidates = this.get_random_shots(
       legal_balls, cueball, legal_balls.length * 20);
-  var partitions = this.partition_candidates(
-      candidates, function(a){return a.difficulty < 1});
 
-  if (partitions.easy.length > 0) {
-    return partitions.easy;
-  }
-  if (partitions.hard.length > 0) {
-    return partitions.hard;
+  if (candidates.length > 0) {
+    var easy = this.grep_candidates(
+        candidates, function(candidate) {return candidate.difficulty < 1});
+    if (easy.length > 0) {
+      return easy;
+    }
+    return candidates;
   }
 
   var random_aimpoint = new Vector(Math.random() * 2 - 1, Math.random() - 0.5);
@@ -209,46 +221,28 @@ ComputerPlayer.prototype.begin_shot = function() {
 
   var shot_candidates = this.get_shot_condidates(legal_balls, table.cue_ball);
 
-  var shot_vectors = [];
-  for (var i = 0; i < shot_candidates.length; i++) {
-    shot_vectors.push(shot_candidates[i].shot_vector());
-  }
-
-  for (var i = 0; i < shot_vectors.length; i++) {
-    shot_vectors[i].add(table.cue_ball.position);
-  }
-
   var delay = 700;
-  setTimeout(function() {
-    table.begin_shot(table.cue_ball.position);
-    table.adjust_shot(shot_vectors[0].clone());
-  }, delay);
+  setTimeout(function() { shot_candidates[0].begin_shot() }, delay);
 
-  var shots_to_show = shot_vectors.length;
+  var shots_to_show = shot_candidates.length;
   if (shots_to_show > 5) {
     shots_to_show = 5;
   }
 
   function preview_shot(index) {
     delay += 500;
-    setTimeout(function() {
-      table.shot_candidate = shot_candidates[index];
-      table.adjust_shot(shot_vectors[index].clone()) }, delay);
+    setTimeout(function() { shot_candidates[index].begin_shot() }, delay);
   }
 
   for (var i = 1; i < shots_to_show; i++) {
-    preview_shot(i % shot_vectors.length);
+    preview_shot(i % shot_candidates.length);
   }
 
-  var index = Math.floor(Math.random() * shot_vectors.length);
-  var shot_vector = shot_vectors[index].clone();
+  var index = Math.floor(Math.random() * shot_candidates.length);
   console.log(shot_candidates[index]);
 
   preview_shot(index);
 
   delay += 1000;
-  setTimeout(function() {
-    table.commit_shot(shot_vector.clone());
-    table.shot_candidate = null;
-  }, delay);
+  setTimeout(function() { shot_candidates[index].commit_shot() }, delay);
 }

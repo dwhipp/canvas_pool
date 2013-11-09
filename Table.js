@@ -8,56 +8,58 @@ function Table () {
 
 
 Table.prototype.initialize = function ( game ) {
-    this.balls = new Array();
-    this.pockets = new Array();
-    this.cushions = new Array();
+  this.balls = new Array();
+  this.pockets = new Array();
+  this.cushions = new Array();
 
-    this.pockets.push(new Pocket( -1, -.5, ball_scale*pocket_scale ));
-    this.pockets.push(new Pocket( -1,  .5, ball_scale*pocket_scale ));
-    this.pockets.push(new Pocket(  0, -.5, ball_scale*pocket_scale ));
-    this.pockets.push(new Pocket(  0,  .5, ball_scale*pocket_scale ));
-    this.pockets.push(new Pocket(  1, -.5, ball_scale*pocket_scale ));
-    this.pockets.push(new Pocket(  1,  .5, ball_scale*pocket_scale ));
+  this.pockets.push(new Pocket( -1, -.5, ball_scale*pocket_scale ));
+  this.pockets.push(new Pocket( -1,  .5, ball_scale*pocket_scale ));
+  this.pockets.push(new Pocket(  0, -.5, ball_scale*pocket_scale ));
+  this.pockets.push(new Pocket(  0,  .5, ball_scale*pocket_scale ));
+  this.pockets.push(new Pocket(  1, -.5, ball_scale*pocket_scale ));
+  this.pockets.push(new Pocket(  1,  .5, ball_scale*pocket_scale ));
 
-    this.cushions.push( new Cushion( -1, 0.5, Math.PI/2, ball_scale*pocket_scale ) );
-    this.cushions.push( new Cushion( 0, 0.5, Math.PI/2, ball_scale*pocket_scale ) );
-    this.cushions.push( new Cushion( 0, -0.5, -Math.PI/2, ball_scale*pocket_scale ) );
-    this.cushions.push( new Cushion( 1, -0.5, -Math.PI/2, ball_scale*pocket_scale ) );
-    this.cushions.push( new Cushion( 1, 0.5, Math.PI, ball_scale*pocket_scale ) );
-    this.cushions.push( new Cushion( -1, -0.5, 0, ball_scale*pocket_scale ) );
+  this.cushions.push( new Cushion( -1, 0.5, Math.PI/2, ball_scale*pocket_scale ) );
+  this.cushions.push( new Cushion( 0, 0.5, Math.PI/2, ball_scale*pocket_scale ) );
+  this.cushions.push( new Cushion( 0, -0.5, -Math.PI/2, ball_scale*pocket_scale ) );
+  this.cushions.push( new Cushion( 1, -0.5, -Math.PI/2, ball_scale*pocket_scale ) );
+  this.cushions.push( new Cushion( 1, 0.5, Math.PI, ball_scale*pocket_scale ) );
+  this.cushions.push( new Cushion( -1, -0.5, 0, ball_scale*pocket_scale ) );
 
-    // cue ball
-    this.cue_ball = new Ball( .5, 0, ball_scale, white, "cue" );
-    this.balls.push( this.cue_ball );
-    this.ball_in_hand = 1;
-    this.shot_count = 0;
+  // cue ball
+  this.cue_ball = new Ball( .5, 0, ball_scale, white, "cue" );
+  this.balls.push( this.cue_ball );
+  this.ball_in_hand = 1;
+  this.is_break_shot = false;
 
-    status_message( "game", game );
+  status_message( "game", game );
 
-    if (game == "9 Ball") {
-        this.game = new Game_9ball( this );
-    }
-    else if (game == "8 Ball") {
-        this.game = new Game_8ball( this );
-    }
-    else if (game == "2 Ball") {
-        this.game = new Game_2ball( this );
-    }
-    else if (game == "1 Ball") {
-        this.game = new Game_1ball( this );
-    }
-    else if (game == "0 Ball") {
-        this.game = new Game_0ball( this );
-    }
-    else {
-        alert( "unknown game: " + game );
-    }
+  if (game == "9 Ball") {
+    this.game = new Game_9ball( this );
+    this.is_break_shot = true;
+  }
+  else if (game == "8 Ball") {
+    this.game = new Game_8ball( this );
+    this.is_break_shot = true;
+  }
+  else if (game == "2 Ball") {
+    this.game = new Game_2ball( this );
+  }
+  else if (game == "1 Ball") {
+    this.game = new Game_1ball( this );
+  }
+  else if (game == "0 Ball") {
+    this.game = new Game_0ball( this );
+  }
+  else {
+    alert( "unknown game: " + game );
+  }
 
-    this.game.create_balls( ball_scale );
+  this.game.create_balls( ball_scale );
 }
 
 Table.prototype.legal_ball_in_hand_bounding_box = function() {
-  if (this.shot_count == 0) {
+  if (this.is_break_shot) {
     return { 'left': 0.5 - this.cue_ball.radius, 'right': +1, 'top': -.5, 'bottom' : +.5 };
   } else {
     return { 'left': -1, 'right': +1, 'top': -.5, 'bottom' : +.5 };
@@ -149,7 +151,7 @@ Table.prototype.commit_shot = function ( point ) {
     if (this.shot) {
         this.shot.commit( point );
         this.shot = null;
-        ++this.shot_count;
+        this.is_break_shot = false;
         this.do_action();
     }
 }

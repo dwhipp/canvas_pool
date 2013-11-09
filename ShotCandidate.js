@@ -86,10 +86,10 @@ ShotCandidate.prototype.is_possible = function() {
 ShotCandidate.prototype.shot_vector = function() {
   var aim = this.aimpoint.difference(this.cueball.position);
   var strength = this.strength;
-  if (this.table.shot_count == 0) {
+  if (this.table.is_break_shot) {
     strength = 0.8;
   }
-  return aim.unit().scale(strength * -1);
+  return aim.unit().scale(strength * -1).add(this.cueball.position);
 }
 
 ShotCandidate.prototype.draw = function(ctx) {
@@ -109,4 +109,17 @@ ShotCandidate.prototype.draw = function(ctx) {
   ctx.lineTo(end.x,end.y);
   ctx.closePath();
   ctx.stroke();
+}
+
+ShotCandidate.prototype.begin_shot = function() {
+  var table = this.table;
+  table.shot_candidate = this;
+  table.begin_shot(this.cueball.position);
+  table.adjust_shot(this.shot_vector());
+}
+
+ShotCandidate.prototype.commit_shot = function() {
+  var table = this.table;
+  table.commit_shot(this.shot_vector());
+  table.shot_candidate = null;
 }
