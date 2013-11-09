@@ -11,6 +11,12 @@ function Ball( x, y, radius, color, name ) {
     this.name = name;
 }
 
+Ball.prototype.stop = function () {
+  this.velocity.zero();
+  this.spin.zero();
+  this.acceleration.zero();
+}
+
 Ball.prototype.is_stable = function () {
     return this.velocity.is_null() && this.spin.is_null();
 }
@@ -164,9 +170,12 @@ Ball.prototype.do_collision = function ( other ) {
     return true;
 }
 
-Ball.prototype.is_potted = function (pockets) {
+Ball.prototype.is_potted = function (pockets, position) {
+    if ( ! position ) {
+      position = this.position;
+    }
     for (p in pockets) {
-        var sep = this.position.distance_from( pockets[p].position );
+        var sep = position.distance_from( pockets[p].position );
         if (sep < this.radius/2 + pockets[p].radius) return true;
     }
     return false;
@@ -202,7 +211,7 @@ Ball.prototype.is_legal_ball_in_hand_position = function ( table, position ) {
       if (impact) return false;
     }
 
-    if (this.is_potted( table.pockets )) return false;
+    if (this.is_potted( table.pockets, position )) return false;
 
     return true;
 }

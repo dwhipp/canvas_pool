@@ -13,6 +13,12 @@ function Cushion( x, y, direction, depth ) {
     p.line( depth * 2, direction - Math.PI/4 );
 
     this.polygon = p;
+
+    this.start = p.points[1];
+    this.end = p.points[2];
+    this.direction = direction;
+    this.to_end = this.end.difference(this.start);
+    this.normal = this.to_end.normal();
 }
 
 Cushion.prototype.draw = function (ctx) {
@@ -65,3 +71,22 @@ Cushion.prototype.impact_in_line = function ( start, end, ball) {
     return normal;
 }
 
+Cushion.prototype.cushion_aimpoint = function(ball, target) {
+  var cushion = new Line(this.start, this.end);
+  cushion.move(this.normal.unit().scale(-ball.radius));
+
+  var start = cushion.start;
+  var to_ball = target.difference(start);
+  var direction = this.to_end.angle();
+  var angle = 2 * direction - to_ball.angle();
+  var magnitude = to_ball.magnitude();
+  var virtual = polar_vector(magnitude, angle).add(start);
+  var path = new Line(ball.position, virtual);
+
+  var bouncepoint = path.intersect(cushion);
+
+  if (cushion.distance_to(bouncepoint) == null) {
+    return null;
+  }
+  return bouncepoint;
+}

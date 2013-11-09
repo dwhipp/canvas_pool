@@ -56,6 +56,7 @@ Table.prototype.initialize = function ( game ) {
   }
 
   this.game.create_balls( ball_scale );
+  this.game.force_position_for_testing();
 }
 
 Table.prototype.legal_ball_in_hand_bounding_box = function() {
@@ -95,6 +96,7 @@ Table.prototype.get_pocket_by_position = function(x, y, distance) {
 
 Table.prototype.replace_ball = function ( ball ) {
 
+    ball.stop();
     var x = -0.5;
     var direction = -1;
     var done = 0;

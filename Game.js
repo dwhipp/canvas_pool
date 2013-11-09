@@ -464,20 +464,33 @@ Game_1ball.prototype.shot_complete = function () {
   this.current_player = 1 - this.current_player;
 
   var player = this.players[ this.current_player ];
-  status_message( "To Shoot: ", player.name );
+  var name = this.current_player == 0 ? "yellow" : "red";
+  status_message( "To Shoot: ", player.name + " (" + name + ")" );
 }
 
 Game_2ball.prototype.shot_complete = Game_1ball.prototype.shot_complete;
 
 Game.prototype.force_position_for_testing = function() {}
 
-/*
-Game_1ball.prototype.force_position_for_testing = function() {
+Game_2ball.prototype.legal_balls = function(player) {
+  var balls = this.table.balls;
+  var name = this.current_player == 0 ? "yellow" : "red";
+  var cue_ball = this.table.cue_ball;
+  var legal = [];
+  for (i in balls) {
+    var ball = balls[i];
+    if (ball.name == name) {
+      legal.push(ball);
+    }
+  }
+  return legal;
+}
+
+Game_2ball.prototype.force_position_for_testing = function() {
   var table = this.table;
-  var pocket = table.get_pocket_by_position(0, -.5);
-  var base = pocket.aimpoint;
-  table.get_ball_by_name('object').set_position(base, -1.3, 3);
-  table.get_ball_by_name('cue').set_position(base, 2, 4);
+  var base = new Vector(0, 0);
+  table.get_ball_by_name('cue').set_position(base, -12, 2);
+  table.get_ball_by_name('yellow').set_position(base, -7, 0);
+  table.get_ball_by_name('red').set_position(base, 0, -2);
   table.ball_in_hand = 0;
 }
-*/

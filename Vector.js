@@ -118,3 +118,32 @@ Vector.prototype.distance_from_line = function(start, end) {
   return Math.abs(distance_from_start * Math.sin(angle_from_start));
 }
 
+function Line(a,b) {
+  this.start = a.clone();
+  this.end = b.clone();
+}
+
+Line.prototype.move = function(vec) {
+  this.start.add(vec);
+  this.end.add(vec);
+}
+
+Line.prototype.distance_to = function(point) {
+  return point.distance_from_line(this.start, this.end);
+}
+
+Line.prototype.intersect = function(other) {
+  var x1 = this.start.x;
+  var y1 = this.start.y;
+  var x2 = this.end.x;
+  var y2 = this.end.y;
+  var x3 = other.start.x;
+  var y3 = other.start.y;
+  var x4 = other.end.x;
+  var y4 = other.end.y;
+
+  var px = (x1*y2-y1*x2)*(x3-x4) - (x1-x2)*(x3*y4-y3*x4);
+  var py = (x1*y2-y1*x2)*(y3-y4) - (y1-y2)*(x3*y4-y3*x4);
+  var scale = (x1-x2)*(y3-y4) - (y1-y2)*(x3-x4);
+  return new Vector(px/scale, py/scale);
+}

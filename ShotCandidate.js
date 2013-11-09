@@ -1,6 +1,7 @@
 // Holds details of a potential shot, calculated for computer player.
 
-function ShotCandidate(table, cueball, aimpoint, object_ball, pocket) {
+function ShotCandidate(
+    table, cueball, cueball_cushion, aimpoint, object_ball, pocket) {
   this.table = table;
   this.aimpoint = aimpoint;
   this.cueball = cueball;
@@ -11,6 +12,32 @@ function ShotCandidate(table, cueball, aimpoint, object_ball, pocket) {
   this.strength = 0.25;
 
   if (!object_ball) {
+    return;
+  }
+
+  if (cueball_cushion) {
+    this.cueball_cushion = cueball_cushion;
+    var bouncepoint = cueball_cushion.cushion_aimpoint(cueball, aimpoint);
+    if (bouncepoint == null) {
+      this.difficulty = 8002;
+      return;
+    }
+    this.aimpoint = bouncepoint;
+    var cueball_to_bounce_is_blocked = table.path_blocked(
+        cueball, cueball.position, bouncepoint, object_ball);
+    if (table.path_blocked(cueball, cueball.position, bouncepoint, object_ball)) {
+      this.difficulty = 8000;
+      return;
+    }
+    if (table.path_blocked(cueball, bouncepoint, object_ball.position, object_ball)) {
+      this.difficulty = 8001;
+      return;
+    }
+
+    var a = cueball.position.distance_from(bouncepoint);
+    var b = object_ball.position.distance_from(bouncepoint);
+
+    this.difficulty = (a+b)/2;
     return;
   }
 
@@ -56,7 +83,8 @@ function ShotCandidate(table, cueball, aimpoint, object_ball, pocket) {
   // pocket direction -- i.e. impossible. For other angles, the close the
   // object ball is to the pocket, the simpler the shot becomes.
   // The table width is 1.0, and its length 2.0.
-  this.difficulty = this.angular_difficulty * this.pocket_distance * this.pocket_distance;
+  this.difficulty =
+      this.angular_difficulty * this.pocket_distance * this.pocket_distance;
   var object_ball_to_pocket_blocked = table.path_blocked(
       object_ball, object_ball.position, pocket.aimpoint);
 
@@ -69,6 +97,28 @@ function ShotCandidate(table, cueball, aimpoint, object_ball, pocket) {
 
   this.strength = this.aimpoint_distance * 0.15 +
       this.pocket_distance * 0.15 * Math.pow(1.6, this.angular_difficulty);
+}
+
+ShotCandidate.direct_shot = function(
+    table, cueball, object_ball, pocket) {
+  var aimpoint = pocket.get_aimpoint(cueball, object_ball);
+  return new ShotCandidate(table, cueball, null, aimpoint, object_ball, pocket);
+}
+
+ShotCandidate.pocketless_shot = function(
+    table, cueball, aimpoint, object_ball) {
+  return new ShotCandidate(table, cueball, null, aimpoint, object_ball, null);
+}
+
+ShotCandidate.random_shot = function(table, cueball, random_aimpoint) {
+  return new ShotCandidate(
+      table, cueball, null, random_aimpoint, null, null);
+}
+
+ShotCandidate.cueball_cushion_shot = function(
+    table, cueball, cushion, aimpoint, object_ball) {
+  return new ShotCandidate(
+      table, cueball, cushion, aimpoint, object_ball, null);
 }
 
 ShotCandidate.sort_by_difficulty = function(a,b) {

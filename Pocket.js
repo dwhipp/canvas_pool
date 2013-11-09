@@ -55,3 +55,16 @@ Pocket.prototype.shot_would_pot_cueball = function(shot_candidate) {
   return false;
 }
 
+
+Pocket.prototype.get_aimpoint = function(cueball, object_ball) {
+  var pocket_to_ball = object_ball.position.difference(this.aimpoint);
+  var ball_to_aimpoint = pocket_to_ball.unit().scale(object_ball.radius + cueball.radius);
+  return ball_to_aimpoint.add(object_ball.position);
+}
+
+Pocket.prototype.get_ball_in_hand_candidate = function(cueball, object_ball) {
+  var pocket_to_ball = object_ball.position.difference(this.aimpoint);
+  var angle = pocket_to_ball.angle() + (Math.random() - 0.5) * Math.PI / 2;
+  var magnitude = (1 + Math.random() * 3) * (object_ball.radius + cueball.radius);
+  return polar_vector(magnitude, angle).add(object_ball.position);
+}
