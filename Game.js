@@ -486,6 +486,7 @@ Game_2ball.prototype.legal_balls = function(player) {
   return legal;
 }
 
+/*
 Game_2ball.prototype.force_position_for_testing = function() {
   var table = this.table;
   var base = new Vector(0, 0);
@@ -494,3 +495,4 @@ Game_2ball.prototype.force_position_for_testing = function() {
   table.get_ball_by_name('red').set_position(base, 0, -2);
   table.ball_in_hand = 0;
 }
+*/

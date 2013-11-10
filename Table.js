@@ -246,7 +246,7 @@ Table.prototype.update = function () {
         }
     }
 
-    for (i in this.balls) {
+    for (var i = 0; i < this.balls.length; i++) {
         var ball = this.balls[i];
         var cushion = ball.do_cushion( this );
         if (cushion) {
@@ -254,30 +254,34 @@ Table.prototype.update = function () {
         }
     }
 
-    for (ball in this.balls) {
-        this.balls[ball].do_friction();
-    }
-
-    for (ball in this.balls) {
-        this.balls[ball].end_update(this);
+    for (var i = 0; i < this.balls.length; i++) {
+        this.balls[i].do_friction();
     }
 
     var potted = new Array();
-    for (i in this.balls) {
-        var ball = this.balls[i];
-        if (ball.is_potted( this.pockets )) {
-            ball.stop();
+    for (var i = 0; i < this.balls.length; i++) {
+        if (this.balls[i].is_potted( this.pockets )) {
             potted.push(i);
         }
     }
-
     while (potted.length) {
         var i = potted.shift();
-        var ball = this.balls[i];
-        ball.stop();
-        this.game.potted( ball );
+        this.game.potted(this.balls[i]);
         this.balls[i] = this.balls[0];
         this.balls.shift();
+    }
+
+    var off_table = new Array();
+    for (var i = 0; i < this.balls.length; i++) {
+      if (!this.balls[i].end_update(this)) {
+        off_table.push(i);
+      }
+    }
+    while (off_table.length) {
+      var i = off_table.shift();
+      this.game.off_table_balls.push(this.balls[i]);
+      this.balls[i] = this.balls[0];
+      this.balls.shift();
     }
 }
 

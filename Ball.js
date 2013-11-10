@@ -75,12 +75,13 @@ Ball.prototype.end_update = function ( table ) {
 	    || this.position.y - this.radius < -.5
 	    || this.position.y + this.radius > .5
        ) {
-	table.game.off_table_balls.push(this);
 	this.stop();
+        return false;
     }
     else
     {
 	this.velocity.add( this.acceleration );
+        return true;
     }
 }
 
