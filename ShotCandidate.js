@@ -169,6 +169,7 @@ ShotCandidate.prototype.begin_shot = function() {
 }
 
 ShotCandidate.prototype.commit_shot = function() {
+  // console.log("commit", this);
   var table = this.table;
   table.commit_shot(this.shot_vector());
   table.shot_candidate = null;

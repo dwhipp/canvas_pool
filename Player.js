@@ -141,7 +141,7 @@ ComputerPlayer.prototype.get_shot_candidates = function(legal_balls, cueball, ha
   if (candidates.length > 0) {
     var easy = this.grep_candidates(
         candidates, function(candidate) {return candidate.is_easy()});
-    console.log("Candidates: ", easy.length, candidates);
+    // console.log("Candidates: ", easy.length, candidates);
 
     if (easy.length > 0) {
       return easy;
@@ -254,7 +254,6 @@ ComputerPlayer.prototype.begin_shot = function() {
   }
 
   var index = Math.floor(Math.random() * shot_candidates.length);
-  console.log(shot_candidates[index]);
 
   preview_shot(index);
 

@@ -224,9 +224,9 @@ Table.prototype.draw = function () {
         this.shot.draw( ctx );
     }
 
-    if (this.shot_candidate) {
-      this.shot_candidate.draw( ctx );
-    }
+ //  if (this.shot_candidate) {
+ //    this.shot_candidate.draw( ctx );
+ //  }
 }
 
 Table.prototype.update = function () {
@@ -261,6 +261,7 @@ Table.prototype.update = function () {
     var potted = new Array();
     for (var i = 0; i < this.balls.length; i++) {
         if (this.balls[i].is_potted( this.pockets )) {
+            this.balls[i].stop();
             potted.push(i);
         }
     }
@@ -274,6 +275,7 @@ Table.prototype.update = function () {
     var off_table = new Array();
     for (var i = 0; i < this.balls.length; i++) {
       if (!this.balls[i].end_update(this)) {
+        this.balls[i].stop();
         off_table.push(i);
       }
     }
@@ -286,11 +288,10 @@ Table.prototype.update = function () {
 }
 
 Table.prototype.is_stable = function () {
-    for (i in this.balls) {
-        var ball = this.balls[i];
-        if (!ball.is_stable()) return false;
-    }
-    return true;
+  for (i in this.balls) {
+    if (!this.balls[i].is_stable()) return false;
+  }
+  return true;
 }
 
 Table.prototype.do_action = function () {
