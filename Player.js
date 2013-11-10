@@ -196,15 +196,12 @@ ComputerPlayer.prototype.set_ball_in_hand_position = function(legal_balls) {
   var pockets = table.pockets;
   var cue_ball = table.cue_ball;
   var positions = [];
-  for (var i = 0; i < legal_balls.length * 5; i++) {
-    var ball = legal_balls[i % legal_balls.length];
-    for (var j = 0; j < pockets.length; j++) {
-      var position = pockets[j].get_ball_in_hand_candidate(cue_ball, ball);
-      if (cue_ball.is_legal_ball_in_hand_position(table, position) ) {
-        if (this.get_shot_candidates(legal_balls, cue_ball, true)) {
-          positions.push(position);
-        }
-      }
+  for (var i = 0; i < 500; i++) {
+    var position = table.random_position(cue_ball);
+    cue_ball.position = position;
+    if (cue_ball.is_legal_ball_in_hand_position(table, position) &&
+        this.get_shot_candidates(legal_balls, cue_ball, true)) {
+      positions.push(position);
     }
   }
   if (positions.length == 0) {

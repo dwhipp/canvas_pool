@@ -339,3 +339,8 @@ Table.prototype.collision_would_pot_cueball = function(shot_candidate) {
   return false;
 }
 
+Table.prototype.random_position = function(ball) {
+  return new Vector(Math.random() * 2 * (1 - ball.radius) - 1,
+                    Math.random() * (1 - ball.radius) - 0.5);
+}
+
