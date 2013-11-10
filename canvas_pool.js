@@ -95,6 +95,7 @@ function init_pool_table(name) {
 
     if (draw_id) {
         clearInterval( draw_id );
+        draw_id = null;
     }
 
     var game_rb = document.getElementsByName( name + "_game" );
@@ -263,8 +264,7 @@ function init_pool_table(name) {
         function key_down_fn(evt) {
             if (evt.keyCode == 48) { // '0'
                 for (i in table.balls) {
-                    table.balls[i].velocity.zero();
-                    table.balls[i].spin.zero();
+                    table.balls[i].stop();
                 }
             }
             if (evt.keyCode == 57) { // '9'
@@ -305,6 +305,8 @@ function init_pool_table(name) {
             }
         }
 
-        draw_id = setInterval( draw_fn, 50 );
+        if (draw_id == null) {
+          draw_id = setInterval( draw_fn, 50 );
+        }
     }
 }

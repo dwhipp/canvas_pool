@@ -266,6 +266,7 @@ Table.prototype.update = function () {
     for (i in this.balls) {
         var ball = this.balls[i];
         if (ball.is_potted( this.pockets )) {
+            ball.stop();
             potted.push(i);
         }
     }
@@ -273,8 +274,7 @@ Table.prototype.update = function () {
     while (potted.length) {
         var i = potted.shift();
         var ball = this.balls[i];
-        ball.velocity.zero();
-        ball.spin.zero();
+        ball.stop();
         this.game.potted( ball );
         this.balls[i] = this.balls[0];
         this.balls.shift();

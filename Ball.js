@@ -70,14 +70,13 @@ Ball.prototype.begin_update = function () {
 }
 
 Ball.prototype.end_update = function ( table ) {
-    if (this.position.x < -1
-	    || this.position.x > 1
-	    || this.position.y < -.5
-	    || this.position.y > .5
+    if (this.position.x - this.radius < -1
+	    || this.position.x + this.radius > 1
+	    || this.position.y - this.radius < -.5
+	    || this.position.y + this.radius > .5
        ) {
 	table.game.off_table_balls.push(this);
-	this.velocity.zero();
-	this.spin.zero();
+	this.stop();
     }
     else
     {
