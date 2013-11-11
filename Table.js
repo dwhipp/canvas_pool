@@ -224,9 +224,9 @@ Table.prototype.draw = function () {
         this.shot.draw( ctx );
     }
 
- //  if (this.shot_candidate) {
- //    this.shot_candidate.draw( ctx );
- //  }
+    if (DEBUG && this.shot_candidate) {
+      this.shot_candidate.draw( ctx );
+    }
 }
 
 Table.prototype.update = function () {

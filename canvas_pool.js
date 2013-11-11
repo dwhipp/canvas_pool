@@ -90,6 +90,11 @@ function set_player_type(form, index) {
   }
 }
 
+var DEBUG = false;
+function set_debug_mode(name) {
+  var debug_input = document.getElementsByName(name);
+  DEBUG = debug_input[0].checked;
+}
 
 function init_pool_table(name) {
 

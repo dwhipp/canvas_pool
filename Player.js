@@ -20,7 +20,6 @@ Player.prototype.mouse_move = function(vec) {}
 
 Player.prototype.begin_shot = function() {
   this.game.force_position_for_testing();
-  // console.log("BEGIN: " + this.name);
 }
 
 // -- Human --
@@ -141,7 +140,7 @@ ComputerPlayer.prototype.get_shot_candidates = function(legal_balls, cueball, ha
   if (candidates.length > 0) {
     var easy = this.grep_candidates(
         candidates, function(candidate) {return candidate.is_easy()});
-    // console.log("Candidates: ", easy.length, candidates);
+    if (DEBUG) console.log("Candidates: ", easy.length, candidates);
 
     if (easy.length > 0) {
       return easy;
@@ -187,7 +186,7 @@ ComputerPlayer.prototype.get_shot_candidates = function(legal_balls, cueball, ha
   }
 
   var random_aimpoint = new Vector(Math.random() * 2 - 1, Math.random() - 0.5);
-  console.log("RANDOM: ", random_aimpoint);
+  if (DEBUG) console.log("RANDOM: ", random_aimpoint);
   return [ShotCandidate.random_shot(this.table, cueball, random_aimpoint)];
 }
 
@@ -224,7 +223,7 @@ ComputerPlayer.prototype.begin_shot = function() {
   game.force_position_for_testing();
 
   var legal_balls = this.game.legal_balls(this);
-  // console.log("BEGIN COMPUTER SHOT");
+  if (DEBUG) console.log("BEGIN COMPUTER SHOT");
 
   if (table.ball_in_hand) {
     this.set_ball_in_hand_position(legal_balls);
