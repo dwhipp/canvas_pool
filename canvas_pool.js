@@ -36,6 +36,7 @@ var classes = new Array(
         "Ball",
         "Cushion",
         "Game",
+        "Line",
         "Player",
         "Pocket",
         "Polygon",

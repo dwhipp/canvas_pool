@@ -19,12 +19,12 @@ Table.prototype.initialize = function ( game ) {
   this.pockets.push(new Pocket(  1, -.5, ball_scale*pocket_scale ));
   this.pockets.push(new Pocket(  1,  .5, ball_scale*pocket_scale ));
 
-  this.cushions.push( new Cushion( -1, 0.5, Math.PI/2, ball_scale*pocket_scale ) );
-  this.cushions.push( new Cushion( 0, 0.5, Math.PI/2, ball_scale*pocket_scale ) );
-  this.cushions.push( new Cushion( 0, -0.5, -Math.PI/2, ball_scale*pocket_scale ) );
-  this.cushions.push( new Cushion( 1, -0.5, -Math.PI/2, ball_scale*pocket_scale ) );
-  this.cushions.push( new Cushion( 1, 0.5, Math.PI, ball_scale*pocket_scale ) );
-  this.cushions.push( new Cushion( -1, -0.5, 0, ball_scale*pocket_scale ) );
+  this.cushions.push( new Cushion( -1, 0.5, 1, Math.PI/2, ball_scale*pocket_scale ) );
+  this.cushions.push( new Cushion( 0, 0.5, 1, Math.PI/2, ball_scale*pocket_scale ) );
+  this.cushions.push( new Cushion( 0, -0.5, 1, -Math.PI/2, ball_scale*pocket_scale ) );
+  this.cushions.push( new Cushion( 1, -0.5, 1, -Math.PI/2, ball_scale*pocket_scale ) );
+  this.cushions.push( new Cushion( 1, 0.5, 1, Math.PI, ball_scale*pocket_scale ) );
+  this.cushions.push( new Cushion( -1, -0.5, 1, 0, ball_scale*pocket_scale ) );
 
   // cue ball
   this.cue_ball = new Ball( .5, 0, ball_scale, white, "cue" );
@@ -310,10 +310,11 @@ Table.prototype.do_action = function () {
 
 Table.prototype.path_blocked = function(ball_at_start, start_position, target, ball_at_target) {
   var balls = this.balls;
+  var path = new Line(start_position, target);
   for (var i = 0; i < balls.length; i++) {
     var ball = balls[i];
     if (ball != ball_at_start && ball != ball_at_target &&
-        ball.blocks_path(start_position, target)) {
+        ball.blocks_path(path)) {
       return true;
     }
   }

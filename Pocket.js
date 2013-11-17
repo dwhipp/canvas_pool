@@ -38,15 +38,17 @@ Pocket.prototype.shot_would_pot_cueball = function(shot_candidate) {
     return false;
   }
 
+  var path = new Line(aimpoint, final_destination);
+
   var distance_from_pocket =
-      this.position.distance_from_line(aimpoint, final_destination);
+      this.position.distance_from_line(path);
   if (distance_from_pocket != null &&
       distance_from_pocket < this.radius + cueball.radius) {
     return true;
   }
 
   var distance_from_pocket_aimpoint =
-      this.aimpoint.distance_from_line(aimpoint, final_destination);
+      this.aimpoint.distance_from_line(path);
   if (distance_from_pocket_aimpoint != null &&
       distance_from_pocket_aimpoint < this.radius) {
     return true;

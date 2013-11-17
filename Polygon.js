@@ -5,6 +5,15 @@ function Polygon (start) {
     this.points.push(start);
 }
 
+Polygon.prototype.center = function() {
+  var center = new Vector(0, 0);
+  for (var i = 0; i < this.points.length; i++) {
+    center.add(this.points[i]);
+  }
+  center.scale_down(this.points.length);
+  return center;
+}
+
 Polygon.prototype.move = function( length, angle ) {
     var vec = polar_vector( length, angle );
     return this.points[ this.points.length - 1].add(vec);

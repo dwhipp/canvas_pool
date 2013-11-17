@@ -1,81 +1,102 @@
 // A cushion is used to stop a ball moving off the table: when a ball
 // collides with a cushion its velocity will be reversed.
 
-function Cushion( x, y, direction, depth ) {
-    var p = new Polygon( new Vector(x,y) );
-    var sqrt2 = Math.SQRT2;
-    var pi = Math.PI;
+// x, y is centerpoint of cushion
+// length is length of inner edge
+// direction is angle along the length of the cushion.
+// depth is distance from inside edge to outside (the edge of the table).
+function Cushion( x, y, length, direction, depth ) {
+  var p = new Polygon(new Vector(x,y));
+  var sqrt2 = Math.SQRT2;
 
-    p.move( depth , direction - Math.PI/4 );
+  p.move( depth , direction - Math.PI/4 );
 
-    p.line( depth * 2, direction + Math.PI/4 );
-    p.line( 1 - 6 * depth/sqrt2, direction );
-    p.line( depth * 2, direction - Math.PI/4 );
+  p.line( depth * 2, direction + Math.PI/4 );
+  p.line( length - 6 * depth/sqrt2, direction );
+  p.line( depth * 2, direction - Math.PI/4 );
 
-    this.polygon = p;
+  this.polygon = p;
 
-    this.start = p.points[1];
-    this.end = p.points[2];
-    this.direction = direction;
-    this.to_end = this.end.difference(this.start);
-    this.normal = this.to_end.normal();
+  this.start = p.points[1];
+  this.end = p.points[2];
+  this.direction = direction;
+  this.to_end = this.end.difference(this.start);
+  this.normal = this.to_end.normal();
+  this.center = p.center();
 }
 
 Cushion.prototype.draw = function (ctx) {
-    ctx.save();
-    ctx.fillStyle = green;
-    this.polygon.draw(ctx);
-    ctx.fill();
-    ctx.stroke();
-    ctx.restore();
+  ctx.save();
+  ctx.fillStyle = green;
+  this.polygon.draw(ctx);
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
 }
 
-Cushion.prototype.ball_impact_vector = function (ball) {
+// Returns a unit vector whose direction is from the ball to a point on the
+// boundary of the cushion.
+Cushion.prototype.ball_impact_vector = function (ball, position) {
+  if (!position) {
+    position = ball.position;
+  }
 
-    var points = this.polygon.points; // length == 4
-    var i;
+  var points = this.polygon.points; // length == 4
+  var i;
 
-    for (i=0; i<points.length; i++) {
-        var sep = points[i].difference( ball.position );
-        if (sep.magnitude() <= ball.radius) {
-            return sep.unit();
-        }
+  for (i=0; i<points.length; i++) {
+    var sep = points[i].difference( position );
+    if (sep.magnitude() <= ball.radius) {
+      return sep.unit();
     }
+  }
 
-    for (i=1; i<points.length; i++) {
-        var impact = this.impact_in_line( points[i-1], points[i], ball );
-        if (impact) {
-            return impact;
-        }
+  for (i=1; i<points.length; i++) {
+    var impact = this.impact_in_line( points[i-1], points[i], ball );
+    if (impact) {
+      return impact;
     }
+  }
 
-    return null;
+  var path_to_center = new Line(position, this.center);
+  var any_intersect = false;
+  for (i=1; i < points.length && !any_intersect; i++) {
+    var edge = new Line(points[i-1], points[i]);
+    if (path_to_center.intersect(edge, ball.radius / 100)) {
+      any_intersect = true;
+    }
+  }
+  if (!any_intersect) {
+    return this.center.difference(position).unit();
+  }
+
+  return null;
 }
 
 Cushion.prototype.impact_in_line = function ( start, end, ball) {
-    var ball_from_start = ball.position.difference( start );
-    var line_from_start = end.difference( start );
+  var ball_from_start = ball.position.difference( start );
+  var line_from_start = end.difference( start );
 
-    var length = line_from_start.magnitude();
-    var unit = line_from_start.unit();
-    var normal = unit.normal();
+  var length = line_from_start.magnitude();
+  var unit = line_from_start.unit();
+  var normal = unit.normal();
 
-    var d1 = ball_from_start.dot_product( unit );
+  var d1 = ball_from_start.dot_product( unit );
 
-    if ( d1 < 0 ) return null;
-    if ( d1 > length ) return null;
+  if ( d1 < 0 ) return null;
+  if ( d1 > length ) return null;
 
-    var d2 = Math.abs(ball_from_start.dot_product( normal ));
-    if ( d2 > ball.radius ) return null;
+  var d2 = Math.abs(ball_from_start.dot_product( normal ));
+  if ( d2 > ball.radius ) return null;
 
-    return normal;
+  return normal;
 }
 
 Cushion.prototype.cushion_aimpoint = function(ball, target) {
-  var cushion = new Line(this.start, this.end);
-  cushion.move(this.normal.unit().scale(-ball.radius));
+  var bounce_line = new Line(this.start, this.end);
+  bounce_line.move(this.normal.unit().scale(-ball.radius));
 
-  var start = cushion.start;
+  var start = bounce_line.start;
   var to_ball = target.difference(start);
   var direction = this.to_end.angle();
   var angle = 2 * direction - to_ball.angle();
@@ -83,10 +104,10 @@ Cushion.prototype.cushion_aimpoint = function(ball, target) {
   var virtual = polar_vector(magnitude, angle).add(start);
   var path = new Line(ball.position, virtual);
 
-  var bouncepoint = path.intersect(cushion);
+  var bounce_point = path.intersect(bounce_line);
 
-  if (cushion.distance_to(bouncepoint) == null) {
+  if (bounce_point && bounce_point.distance_from_line(bounce_line) == null) {
     return null;
   }
-  return bouncepoint;
+  return bounce_point;
 }
