@@ -92,9 +92,8 @@ AddTestGroup('CushionTest', {
   var cushion = new Cushion(0, 0.5, 1, Math.PI/2, sqrt2/10);
   var d = 0.001;
   for (var x = 0.2; x <= 0.8; x += 0.1) {
-    var ball = new Ball(x, 0.5, d * 1.0001);
+    var ball = new Ball(x, 0.5 - d, d * 1.0001);
     var impact = cushion.ball_impact_vector(ball);
-
     test.assertTrue(impact.y > 0);
   }
 },

@@ -52,7 +52,7 @@ Cushion.prototype.ball_impact_vector = function (ball, position) {
   }
 
   for (i=1; i<points.length; i++) {
-    var impact = this.impact_in_line( points[i-1], points[i], ball );
+    var impact = this.impact_in_line( points[i-1], points[i], position, ball.radius );
     if (impact) {
       return impact;
     }
@@ -73,8 +73,8 @@ Cushion.prototype.ball_impact_vector = function (ball, position) {
   return null;
 }
 
-Cushion.prototype.impact_in_line = function ( start, end, ball) {
-  var ball_from_start = ball.position.difference( start );
+Cushion.prototype.impact_in_line = function ( start, end, position, radius) {
+  var ball_from_start = position.difference( start );
   var line_from_start = end.difference( start );
 
   var length = line_from_start.magnitude();
@@ -87,7 +87,7 @@ Cushion.prototype.impact_in_line = function ( start, end, ball) {
   if ( d1 > length ) return null;
 
   var d2 = Math.abs(ball_from_start.dot_product( normal ));
-  if ( d2 > ball.radius ) return null;
+  if ( d2 > radius ) return null;
 
   return normal;
 }
