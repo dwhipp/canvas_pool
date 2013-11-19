@@ -5,9 +5,13 @@
  .group-pass { color: #0c0; }
  .test-fail { color: #f00; }
  .group-fail { background: #f00; }
+ .all-pass { background: #0c0;}
+ .all-fail { background: #f00; }
 </style>
 
 <script type="text/javascript">
+
+var error_count = 0;
 
 function Test(name, ul) {
   this.name = name;
@@ -42,6 +46,7 @@ Test.prototype.fail = function(msg) {
         .split('\n');
   this.appendMessage(stack, "test-fail");
   this.ok = false;
+  error_count++;
 }
 
 Test.prototype.assertTrue = function(cond) {
@@ -125,13 +130,25 @@ function RunTests() {
   for (var group in testGroups) {
     RunTestGroup(group, testGroups[group]);
   }
+
+  var output_div = document.getElementById("results");
+  if (error_count == 0) {
+    output_div.innerHTML = "All tests passed:"
+    output_div.className = "all-pass";
+  } else if (error_count == 1) {
+    output_div.innerHTML = "One test Failed:";
+    output_div.className = "all-fail";
+  } else {
+    output_div.innerHTML = error_count + " tests Failed:";
+    output_div.className = "all-fail";
+  }
 }
 
 </script>
 </head>
 
 <body onload='RunTests()'>
-Test Results...
+<div id=results>Test Results...</div>
 <div id=main></div>
 </body>
 </html>

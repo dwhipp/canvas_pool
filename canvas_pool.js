@@ -170,12 +170,16 @@ function init_pool_table(name) {
         var txt = document.createTextNode( "Source Classes: " );
         form.appendChild(txt);
 
-        function add_file(name, filename) {
+        function add_file(name, filename, checked) {
             var input = document.createElement("input");
             input.type = "radio";
             input.name = "class_view";
             input.value = filename;
-            input.onclick = view_class( filename )
+            input.onclick = view_class( filename );
+            if (checked) {
+              input.checked = true;
+              input.onclick();
+            }
             form.appendChild(input);
             var txt = document.createTextNode( name );
             form.appendChild(txt);
@@ -185,11 +189,11 @@ function init_pool_table(name) {
           add_file(name, name + ".js");
         }
 
+        add_file('tests', 'tests.html', true);
+        add_file( "main", "canvas_pool.js" );
         for (i in classes) {
           add_selection( classes[i] );
         }
-        add_selection( "canvas_pool" );
-        add_file('tests', 'tests.html');
 
         div.innerHTML = "";
         div.appendChild(form);
