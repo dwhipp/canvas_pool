@@ -161,16 +161,17 @@ ShotCandidate.prototype.draw = function(ctx) {
   ctx.stroke();
 }
 
-ShotCandidate.prototype.begin_shot = function() {
+ShotCandidate.prototype.begin_shot = function(shot) {
   var table = this.table;
   table.shot_candidate = this;
-  table.begin_shot(this.cueball.position);
-  table.adjust_shot(this.shot_vector());
+  shot.set_cueball_strikepoint(this.cueball, this.cueball.position);
+  shot.adjust(this.shot_vector());
 }
 
-ShotCandidate.prototype.commit_shot = function() {
+ShotCandidate.prototype.commit_shot = function(shot) {
   if (DEBUG) console.log("commit", this);
+  this.begin_shot(shot);
   var table = this.table;
-  table.commit_shot(this.shot_vector());
+  table.commit_shot();
   table.shot_candidate = null;
 }

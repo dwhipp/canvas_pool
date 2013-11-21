@@ -19,7 +19,7 @@ Player.prototype.mouse_up = function(vec) {}
 Player.prototype.mouse_move = function(vec) {}
 
 Player.prototype.begin_shot = function() {
-  this.game.force_position_for_testing();
+  this.table.begin_shot();
 }
 
 // -- Human --
@@ -32,8 +32,15 @@ HumanPlayer.prototype = new Player();
 
 HumanPlayer.prototype.mouse_down = function(vec) {
   var table = this.table;
+  if (!table.is_stable()) return;
+  if (!table.shot) {
+    this.begin_shot();
+  }
   if (!table.ball_in_hand) {
-    table.begin_shot(vec);
+    var cue_ball = table.cue_ball;
+    if (vec.distance_from(cue_ball.position) < cue_ball.radius) {
+      table.shot.set_cueball_strikepoint(cue_ball, vec);
+    }
   }
 }
 
@@ -46,8 +53,9 @@ HumanPlayer.prototype.mouse_up = function(vec) {
       table.ball_in_hand = 0;
     }
   }
-  else {
-    table.commit_shot( vec );
+  else if (table.shot) {
+    table.shot.adjust( vec );
+    table.commit_shot();
   }
 }
 
@@ -56,8 +64,8 @@ HumanPlayer.prototype.mouse_move = function(vec) {
   if (table.ball_in_hand) {
     table.cue_ball.position = vec;
   }
-  else {
-    table.adjust_shot( vec );
+  else if (table.shot && table.shot.start) {
+    table.shot.adjust( vec );
   }
 }
 
@@ -220,7 +228,7 @@ ComputerPlayer.prototype.begin_shot = function() {
   var table = this.table;
   var game = this.game;
 
-  game.force_position_for_testing();
+  var shot = table.begin_shot();
 
   var legal_balls = this.game.legal_balls(this);
   if (DEBUG) console.log("BEGIN COMPUTER SHOT");
@@ -233,7 +241,7 @@ ComputerPlayer.prototype.begin_shot = function() {
   var shot_candidates = this.get_shot_candidates(legal_balls, table.cue_ball);
 
   var delay = 700;
-  setTimeout(function() { shot_candidates[0].begin_shot() }, delay);
+  setTimeout(function() { shot_candidates[0].begin_shot(shot) }, delay);
 
   var shots_to_show = shot_candidates.length;
   if (shots_to_show > 5) {
@@ -242,7 +250,7 @@ ComputerPlayer.prototype.begin_shot = function() {
 
   function preview_shot(index) {
     delay += 500;
-    setTimeout(function() { shot_candidates[index].begin_shot() }, delay);
+    setTimeout(function() { shot_candidates[index].begin_shot(shot) }, delay);
   }
 
   for (var i = 1; i < shots_to_show; i++) {
@@ -254,5 +262,5 @@ ComputerPlayer.prototype.begin_shot = function() {
   preview_shot(index);
 
   delay += 1000;
-  setTimeout(function() { shot_candidates[index].commit_shot() }, delay);
+  setTimeout(function() { shot_candidates[index].commit_shot(shot) }, delay);
 }

@@ -1,13 +1,15 @@
 // A shot represents a player's turn, from the initial strike of the
 // (cue) ball to when the table returns to when all balls are stationary
 
-function Shot( game, ball, point ) {
+function Shot( table ) {
+    this.table = table;
+}
+
+Shot.prototype.set_cueball_strikepoint = function (ball, point) {
     this.ball = ball;
     this.start = point;
     this.strength = 0;
     this.angle = point.angle();
-    this.game = game;
-    game.begin_shot( this );
 }
 
 Shot.prototype.adjust = function ( point ) {
@@ -17,9 +19,7 @@ Shot.prototype.adjust = function ( point ) {
     if ( this.strength > .4 ) this.strength = .4;
 }
 
-Shot.prototype.commit = function ( point ) {
-    this.adjust( point );
-
+Shot.prototype.commit = function () {
     var ball = this.ball;
 
     var velocity = polar_vector( this.strength * -strength_scaling, this.angle );
@@ -32,11 +32,10 @@ Shot.prototype.commit = function ( point ) {
     var side = polar_vector( this.strength * masse_scaling, this.angle + Math.PI/2).dot_product( off_center);
 
     ball.impulse( velocity, spin, side );
-
-    this.game.ball_struck();
 }
 
 Shot.prototype.draw = function ( ctx ) {
+    if (!this.start) return;
     ctx.strokeStyle = black;
     ctx.lineWidth = 0.005;
     ctx.beginPath();

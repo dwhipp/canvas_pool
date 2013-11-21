@@ -132,30 +132,20 @@ Table.prototype.replace_ball = function ( ball ) {
     this.balls.push(ball);
 }
 
-Table.prototype.begin_shot = function ( point ) {
-
-    if (!this.is_stable()) return;
-
-    var cue_ball = this.cue_ball;
-    var D = point.difference( cue_ball.position );
-    if ( D.squared() > cue_ball.radius*cue_ball.radius ) return;
-
-    this.shot = new Shot( this.game, cue_ball, point );
+Table.prototype.begin_shot = function () {
+  this.game.force_position_for_testing();
+  this.shot = new Shot(this);
+  this.game.begin_shot(this.shot);
+  return this.shot;
 }
 
-Table.prototype.adjust_shot = function ( point ) {
-    if (this.shot) {
-        this.shot.adjust( point );
-    }
-}
-
-Table.prototype.commit_shot = function ( point ) {
-    if (this.shot) {
-        this.shot.commit( point );
-        this.shot = null;
-        this.is_break_shot = false;
-        this.do_action();
-    }
+Table.prototype.commit_shot = function () {
+  if (!this.shot) return;
+  this.shot.commit();
+  this.game.ball_struck();
+  this.shot = null;
+  this.is_break_shot = false;
+  this.do_action();
 }
 
 Table.prototype.draw = function () {
