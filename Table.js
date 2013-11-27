@@ -315,9 +315,9 @@ Table.prototype.collision_would_pot_cueball = function(shot_candidate) {
   var cueball = shot_candidate.cueball;
   var aimpoint = shot_candidate.aimpoint;
   var object_ball = shot_candidate.object_ball;
-  var final_destination = shot_candidate.final_destination;
+  var cueball_destination = shot_candidate.cueball_destination;
 
-  if (this.path_blocked(object_ball, aimpoint, final_destination, cueball)) {
+  if (this.path_blocked(object_ball, aimpoint, cueball_destination, cueball)) {
     return false;
   }
 

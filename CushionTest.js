@@ -12,8 +12,7 @@ AddTestGroup('CushionTest', {
     var impact = cushion.ball_impact_vector(ball);
     var expect = new Vector(0, 1);
 
-    test.assertApproxEquals(expect.x, impact.x, 1e-6);
-    test.assertApproxEquals(expect.y, impact.y, 1e-6);
+    test.assertDotEquals(expect, impact, 1e-6);
   }
 },
 
@@ -29,8 +28,7 @@ AddTestGroup('CushionTest', {
     var impact = cushion.ball_impact_vector(ball);
     var expect = new Vector(1/sqrt2, 1/sqrt2);
 
-    test.assertApproxEquals(expect.x, impact.x, 1e-6);
-    test.assertApproxEquals(expect.y, impact.y, 1e-6);
+    test.assertDotEquals(expect, impact, 1e-6);
   }
 },
 
@@ -46,8 +44,7 @@ AddTestGroup('CushionTest', {
     var impact = cushion.ball_impact_vector(ball);
     var expect = new Vector(-1/sqrt2, 1/sqrt2);
 
-    test.assertApproxEquals(expect.x, impact.x, 1e-6);
-    test.assertApproxEquals(expect.y, impact.y, 1e-6);
+    test.assertDotEquals(expect, impact, 1e-6);
   }
 },
 
@@ -63,8 +60,7 @@ AddTestGroup('CushionTest', {
     var ball = new Ball(0.3 + p.x, 0.4 + p.y, d * 1.0001);
     var impact = cushion.ball_impact_vector(ball);
     var expect = p.scale(-1).unit();
-    test.assertApproxEquals(expect.x, impact.x, 1e-6);
-    test.assertApproxEquals(expect.y, impact.y, 1e-6);
+    test.assertDotEquals(expect, impact, 1e-6);
   }
 },
 
@@ -80,8 +76,7 @@ AddTestGroup('CushionTest', {
     var ball = new Ball(0.7 + p.x, 0.4 + p.y, d * 1.0001);
     var impact = cushion.ball_impact_vector(ball);
     var expect = p.scale(-1).unit();
-    test.assertApproxEquals(expect.x, impact.x, 1e-6);
-    test.assertApproxEquals(expect.y, impact.y, 1e-6);
+    test.assertDotEquals(expect, impact, 1e-6);
   }
 },
 

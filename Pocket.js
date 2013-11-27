@@ -30,7 +30,7 @@ Pocket.prototype.shot_would_pot_cueball = function(shot_candidate) {
   var cueball = shot_candidate.cueball;
   var aimpoint = shot_candidate.aimpoint;
   var object_ball = shot_candidate.object_ball;
-  var final_destination = shot_candidate.final_destination;
+  var cueball_destination = shot_candidate.cueball_destination;
 
   // no in-off from hanging ball
   if (this.aimpoint.distance_from(object_ball.position) < object_ball.radius ||
@@ -38,7 +38,7 @@ Pocket.prototype.shot_would_pot_cueball = function(shot_candidate) {
     return false;
   }
 
-  var path = new Line(aimpoint, final_destination);
+  var path = new Line(aimpoint, cueball_destination);
 
   var distance_from_pocket =
       this.position.distance_from_line(path);

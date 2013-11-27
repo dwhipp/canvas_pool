@@ -71,8 +71,8 @@ Test.prototype.assertApproxEquals = function(expect, actual, epsilon) {
   }
 }
 
-Test.prototype.assertDotEquals = function(expect, actual) {
-  if (!expect.equals(actual)) {
+Test.prototype.assertDotEquals = function(expect, actual, epsilon) {
+  if (!expect.equals(actual, epsilon)) {
     this.fail(
         "assertEquals: expected[[" + expect + "]] actual[[" + actual + "]]");
   }
@@ -107,6 +107,7 @@ var classes = new Array(
     //"Pocket",
     "Polygon",
     //"Shot",
+    "ShotCandidate",
     //"Table",
     "Vector"
 );

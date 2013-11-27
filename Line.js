@@ -5,8 +5,9 @@ function Line(a,b) {
   this.end = b.clone();
 }
 
-Line.prototype.equals = function(other) {
-  return this.start.equals(other.start) && this.end.equals(other.end);
+Line.prototype.equals = function(other, epsilon) {
+  return this.start.equals(other.start, epsilon)
+      && this.end.equals(other.end, epsilon);
 }
 
 Line.prototype.length = function() {

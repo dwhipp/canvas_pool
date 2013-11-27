@@ -17,7 +17,10 @@ Vector.prototype.clone = function () {
     return new Vector( this.x, this.y );
 }
 
-Vector.prototype.equals = function (other) {
+Vector.prototype.equals = function (other, epsilon) {
+  if (epsilon) {
+    return this.distance_from(other) < epsilon;
+  }
   return this.x == other.x && this.y == other.y;
 }
 

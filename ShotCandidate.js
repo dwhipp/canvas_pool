@@ -1,5 +1,69 @@
 // Holds details of a potential shot, calculated for computer player.
 
+function ShotCandidatePath(segments, object_ball, target) {
+  this.segments = segments;
+  this.object_ball = object_ball;
+  this.target = target;
+  this.aimpoint = segments[0].start;
+}
+
+ShotCandidatePath.direct = function(incoming_ball, object_ball, target) {
+  var target_to_ball = object_ball.position.difference(target.aimpoint);
+  var ball_to_aimpoint =
+      target_to_ball.unit().scale(object_ball.radius + incoming_ball.radius);
+  var aimpoint = ball_to_aimpoint.add(object_ball.position);
+  var segments = [ new Line(aimpoint, target.aimpoint) ];
+  return new ShotCandidatePath(segments, object_ball, target);
+}
+
+ShotCandidatePath.one_cushion = function(
+    incoming_ball, object_ball, target, cushion) {
+  var bouncepoint = cushion.cushion_aimpoint(object_ball, target.aimpoint);
+  if (!bouncepoint) return null;
+  var cushion_target = { 'aimpoint': bouncepoint };
+  var shot_candidate_path =
+      ShotCandidatePath.direct(incoming_ball, object_ball, cushion_target);
+  shot_candidate_path.segments.push(new Line(bouncepoint, target.aimpoint));
+  shot_candidate_path.target = target;
+  return shot_candidate_path;
+}
+
+function ShotCandidate2(table, cueball, cueball_cushion, object_path) {
+  this.table = table;
+  this.cueball = cueball;
+  this.aimpoint = pobject_ath.aimpoint;
+  this.object_ball = object_path.object_ball;
+
+  this.difficulty = 0;
+  this.strength = 0.25;
+
+  if (!object_ball) {
+    return;
+  }
+
+  var cueball_segments;
+  if (cueball_cushion) {
+    var bouncepoint = cushion.cushion_aimpoint(cueball, object_path.aimpoint);
+    if (bouncepoint) {
+      cueball_segments = [ new Line(cueball.position, bouncepoint),
+                       new Line(bouncepoint, object_path.aimpoint) ];
+  } else {
+    cueball_segments = [ new Line(cueball.position, object_path.aimpoint) ];
+  }
+
+  if (cueball_segments {
+    this.path = new ShotCandidatePath(cueball_segments, cueball, object_path);
+  } else {
+    this.difficulty = 9000;
+    return;
+  }
+
+  if (this.path.blocked(table)) {
+    this.difficulty = 9001;
+    return;
+  }
+}
+
 function ShotCandidate(
     table, cueball, cueball_cushion, aimpoint, object_ball, pocket) {
   this.table = table;
@@ -47,7 +111,7 @@ function ShotCandidate(
   this.collision_tangent.scale(
       this.collision_tangent.dot_product(this.cueball_to_aimpoint.unit()));
 
-  this.final_destination = this.collision_tangent.add(aimpoint);
+  this.cueball_destination = this.collision_tangent.add(aimpoint);
 
   var cueball_to_object_blocked = table.path_blocked(
       cueball, cueball.position, aimpoint, object_ball);
@@ -152,7 +216,7 @@ ShotCandidate.prototype.draw = function(ctx) {
   ctx.closePath();
   ctx.stroke();
 
-  var end = this.final_destination;
+  var end = this.cueball_destination;
   if (!end) return;
   ctx.beginPath();
   ctx.moveTo(aim.x,aim.y);

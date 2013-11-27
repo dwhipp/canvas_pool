@@ -1,5 +1,8 @@
 // A shot represents a player's turn, from the initial strike of the
-// (cue) ball to when the table returns to when all balls are stationary
+// (cue) ball to when the table returns to when all balls are stationary.
+//
+// For the computer player, it is also used as an anchor for information
+// derrived for the planning of the shot.
 
 function Shot( table ) {
     this.table = table;
