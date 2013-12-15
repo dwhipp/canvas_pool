@@ -81,7 +81,12 @@ Vector.prototype.scale_down = function ( scale ) {
 }
 
 Vector.prototype.unit = function () {
-    return this.clone().scale_down( this.magnitude() );
+  var magnitude = this.magnitude();
+  if (magnitude != 0) {
+    return this.clone().scale_down(magnitude);
+  } else {
+    return new Vector(0, 0);
+  }
 }
 
 Vector.prototype.normal = function () {

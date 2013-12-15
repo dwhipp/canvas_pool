@@ -42,6 +42,7 @@ var classes = new Array(
         "Polygon",
         "Shot",
         "ShotCandidate",
+        "ShotCandidatePath",
         "Table",
         "Vector"
 );
@@ -250,17 +251,23 @@ function init_pool_table(name) {
         }
 
         function mouse_down(evt) {
+          evt.preventDefault();
           table.player().mouse_down(mouse_vec(evt));
         }
 
         function mouse_up(evt) {
+          evt.preventDefault();
           table.player().mouse_up(mouse_vec(evt));
         }
 
         function mouse_move(evt) {
+          evt.preventDefault();
           table.player().mouse_move(mouse_vec(evt));
         }
 
+        canvas.addEventListener( 'touchstart', mouse_down, false );
+        canvas.addEventListener( 'touchend', mouse_up, false );
+        canvas.addEventListener( 'touchmove', mouse_move, false );
         canvas.addEventListener( 'mousedown', mouse_down, false );
         canvas.addEventListener( 'mouseup', mouse_up, false );
         canvas.addEventListener( 'mousemove', mouse_move, false );

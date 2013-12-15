@@ -38,4 +38,29 @@ AddTestGroup('LineTest', {
   test.assertDotEquals(expect, l1.intersect(l2));
 },
 
+'angle' : function(test) {
+  var p0 = new Vector(0, 0);
+  var p1 = new Vector(0, 1);
+  var p2 = new Vector(0, -1);
+  var p3 = new Vector(1, 0);
+  var p4 = new Vector(-1, 0);
+  var l1 = new Line(p0, p1);
+  var l2 = new Line(p0, p2);
+  var l3 = new Line(p0, p3);
+  var l4 = new Line(p0, p4);
+  test.assertEquals(0, l1.angle() / Math.PI);
+  test.assertEquals(1, l2.angle() / Math.PI);
+  test.assertEquals(0.5, l3.angle() / Math.PI);
+  test.assertEquals(-.5, l4.angle() / Math.PI);
+},
+
+'angle_from' : function(test) {
+  var p0 = new Vector(0, 0);
+  var p1 = new Vector(1, 0);
+  var p2 = new Vector(0, -1);
+  var l1 = new Line(p0, p1);
+  var l2 = new Line(p1, p2);
+  test.assertEquals(-0.75, l2.angle_from(l1) / Math.PI);
+},
+
 });

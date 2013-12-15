@@ -57,11 +57,17 @@ Pocket.prototype.shot_would_pot_cueball = function(shot_candidate) {
   return false;
 }
 
-
-Pocket.prototype.get_aimpoint = function(cueball, object_ball) {
-  var pocket_to_ball = object_ball.position.difference(this.aimpoint);
-  var ball_to_aimpoint = pocket_to_ball.unit().scale(object_ball.radius + cueball.radius);
-  return ball_to_aimpoint.add(object_ball.position);
+// calc appropriate aimpoint for the object ball: usually we aim for a point
+// close to the mouth of the pocket, but if the ball is closer to the pocet than
+// that, then use the pocket itself.
+Pocket.prototype.get_aimpoint = function(ball) {
+  var distance_to_aimpoint = this.position.distance_from(this.aimpoint)
+  var distance_to_ball = this.position.distance_from(ball.position)
+  if (distance_to_ball > distance_to_aimpoint) {
+    return this.aimpoint;
+  } else {
+    return this.position;
+  }
 }
 
 Pocket.prototype.get_ball_in_hand_candidate = function(cueball, object_ball) {

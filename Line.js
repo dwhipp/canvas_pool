@@ -10,8 +10,27 @@ Line.prototype.equals = function(other, epsilon) {
       && this.end.equals(other.end, epsilon);
 }
 
+Line.prototype.delta = function() {
+  return this.end.difference(this.start);
+}
+
 Line.prototype.length = function() {
-  return this.start.distance_from(this.end);
+  return this.delta().magnitude();
+}
+
+Line.prototype.unit = function() {
+  return this.delta().unit();
+}
+
+Line.prototype.angle = function() {
+  return this.delta().angle();
+}
+
+Line.prototype.angle_from = function(other) {
+  var diff = other.angle() - this.angle();
+  while (diff > Math.PI) diff -= Math.PI*2;
+  while (diff < -Math.PI) diff += Math.PI*2;
+  return diff;
 }
 
 Line.prototype.move = function(vec) {
