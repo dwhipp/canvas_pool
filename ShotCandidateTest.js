@@ -1,7 +1,7 @@
 function FakeTable() {
-}
-FakeTable.prototype.collision_would_pot_cueball = function() {
-  return false;
+  var returnFalse = function() { return false; }
+  this.collision_would_pot_cueball = returnFalse;
+  this.path_blocked = returnFalse;
 }
 
 AddTestGroup('ShotCandidateTest', {

@@ -50,13 +50,13 @@ AddTestGroup('ShotCandidatePathTest', {
     var path2 = new ShotCandidatePath(segments2, null, p2);
     var path1 = new ShotCandidatePath(segments1, null, path2);
     path1.characterize();
-    test.assertEquals(a * Math.PI, path1.endpoint_angle);
+    test.assertEquals(a, path1.angle_factor);
   }
 
-  check(2, 1, 0.25);
-  check(2, -1, -0.25);
-  check(0, 1, 0.75);
-  check(0, -1, -0.75);
+  check(2, 1, 0.5);
+  check(2, -1, 0.5);
+  check(0, 1, 1.5);
+  check(0, -1, 1.5);
 }
 
 });
