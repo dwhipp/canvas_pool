@@ -58,6 +58,11 @@ function ShotCandidate(table, cueball, cueball_cushion, object_path) {
     this.impossible = "would pot cueball";
     return;
   }
+
+  if (this.strength > .8) {
+    this.impossible = "requires too much strength";
+    return;
+  }
 }
 
 ShotCandidate.direct_shot = function(

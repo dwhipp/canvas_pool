@@ -62,7 +62,8 @@ Pocket.prototype.shot_would_pot_cueball = function(shot_candidate) {
 // that, then use the pocket itself.
 Pocket.prototype.get_aimpoint = function(ball) {
   var distance_to_aimpoint = this.position.distance_from(this.aimpoint)
-  var distance_to_ball = this.position.distance_from(ball.position)
+  var distance_to_ball =
+      this.position.distance_from(ball.position) + ball.radius
   if (distance_to_ball > distance_to_aimpoint) {
     return this.aimpoint;
   } else {

@@ -68,14 +68,12 @@ ShotCandidatePath.prototype.characterize = function() {
   if (this.target.segments) {
     var this_end = this.segments[this.segments.length-1];
     var next_start = this.target.segments[0];
-    this.angle_factor =
-        Math.abs(next_start.angle_from(this_end) * 2 / Math.PI);
-    if (this.angle_factor >= 1) {
+    this.angle_factor = Math.abs(next_start.angle_from(this_end));
+    if (this.angle_factor >= Math.PI / 2) {
       this.impossible = "angle_factor: " + this.angle_factor;
       return;
     }
-    this.angular_difficulty =
-        Math.pow(4, this.angle_factor * this.angle_factor);
+    this.angular_difficulty = 1 / Math.cos(this.angle_factor);
   } else {
     this.angle_factor = 0;
     this.angular_difficulty = 1;
@@ -86,16 +84,16 @@ ShotCandidatePath.prototype.characterize = function() {
     this.difficulty = 0;
   }
   if (this.target.strength) {
-    this.strength = this.target.strength * Math.pow(1.1, this.angle_factor);
+    this.strength = this.target.strength * this.angular_difficulty;
     this.carom = this.calc_carom(this.strength);
   } else if (this.target.draw) {
     this.strength = 0;
   } else {
-    this.strength = 0.5;
+    this.strength = 0.25;
   }
   for (var i = 0; i < this.segments.length; i++) {
-    this.difficulty += this.segments[i].length() * (1 + i/2);
-    this.strength += this.segments[i].length() / 6 * Math.pow(1.1, i);
+    this.difficulty += this.segments[i].length() * (1 + i*2);
+    this.strength += this.segments[i].length() / 10 * (1 + i / 10);
   }
   this.difficulty *= Math.sqrt(this.segments.length);
 }
