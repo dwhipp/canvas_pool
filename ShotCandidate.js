@@ -59,7 +59,7 @@ function ShotCandidate(table, cueball, cueball_cushion, object_path) {
     return;
   }
 
-  if (this.strength > .8) {
+  if (this.strength > .9) {
     this.impossible = "requires too much strength";
     return;
   }
@@ -83,10 +83,12 @@ ShotCandidate.random_shot = function(table, cueball, random_aimpoint) {
   return new ShotCandidate(table, cueball, null, target);
 }
 
-ShotCandidate.cueball_cushion_shot = function(
-    table, cueball, cushion, target, object_ball) {
-  var path = ShotCandidatePath.direct(cueball, object_ball, target);
-  return new ShotCandidate(table, cueball, cushion, path);
+ShotCandidate.cushion_shot = function(
+    table, cueball, cueball_cushion, target, object_ball, object_ball_cushion) {
+  var path = ShotCandidatePath.one_cushion(
+      cueball, object_ball, target, object_ball_cushion);
+  if (!path) return null;
+  return new ShotCandidate(table, cueball, cueball_cushion, path);
 }
 
 ShotCandidate.sort_by_difficulty = function(a,b) {

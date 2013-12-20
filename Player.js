@@ -77,6 +77,8 @@ function ComputerPlayer(name, cue) {
 
 ComputerPlayer.prototype = new Player();
 
+
+
 ComputerPlayer.prototype.get_direct_shots = function(legal_balls, cueball) {
   var pockets = this.table.pockets;
   var candidates = [];
@@ -117,6 +119,61 @@ ComputerPlayer.prototype.get_cushion_shots = function(legal_balls, cueball) {
   return candidates;
 }
 
+ComputerPlayer.prototype.get_potting_candidates = function() {
+  var pockets = this.table.pockets;
+  var balls = this.table.balls;
+  var game = this.game;
+  var cue_ball = this.table.cue_ball;
+  var cushions = this.table.cushions;
+  var candidates = [];
+
+  for (var ball_index = 0; ball_index < balls.length; ball_index++) {
+    var object_ball = balls[ball_index];
+    if (!game.ball_is_good_to_pot(object_ball, this) ||
+        !game.ball_is_ok_to_hit(object_ball, this)) {
+      continue;
+    }
+    for (var pocket_index = 0; pocket_index < pockets.length; pocket_index++) {
+      var pocket = pockets[pocket_index];
+      for (var cueball_cushion_index = 0;
+          cueball_cushion_index <= cushions.length; cueball_cushion_index++) {
+        var cueball_cushion = cushions[cueball_cushion_index];
+        for (var object_ball_cushion_index = 0;
+            object_ball_cushion_index <= cushions.length;
+            object_ball_cushion_index++) {
+          var object_ball_cushion = cushions[object_ball_cushion_index];
+          var candidate = this.get_shot(
+              cue_ball, cueball_cushion, object_ball, object_ball_cushion,
+              pocket);
+          if (candidate) {
+            candidates.push(candidate);
+          }
+        }
+      }
+    }
+  }
+
+  return candidates;
+}
+
+ComputerPlayer.prototype.get_shot = function(
+    cueball, cueball_cushion, object_ball, object_ball_cushion, pocket) {
+  if ((cueball_cushion || object_ball_cushion) && this.table.is_break_shot) {
+    return null;
+  }
+
+  var shot_candidate = ShotCandidate.cushion_shot(
+      this.table, cueball, cueball_cushion, pocket,
+      object_ball, object_ball_cushion);
+
+  if (shot_candidate && shot_candidate.is_possible()) {
+    if (DEBUG) console.log("get_shot: ", shot_candidate);
+    return shot_candidate;
+  }
+
+  return null;
+}
+
 ComputerPlayer.prototype.get_random_shots = function(legal_balls, cueball, count) {
   var candidates = [];
   for (var i = 0; i < count; i++) {
@@ -144,24 +201,19 @@ ComputerPlayer.prototype.grep_candidates = function(candidates, match_fn) {
   return match;
 }
 
-ComputerPlayer.prototype.get_shot_candidates = function(legal_balls, cueball, has_easy) {
+ComputerPlayer.prototype.get_easy_shot_candidates = function(
+    legal_balls, cueball) {
   var candidates = this.get_direct_shots(legal_balls, cueball);
+  var easy = this.grep_candidates(candidates, function(candidate)
+    { return candidate.is_possible() && candidate.is_easy() });
+  return easy.length != 0;
+}
 
-  if (!this.table.is_break_shot) {
-    var cushion_shots = this.get_cushion_shots(legal_balls, cueball);
-    if (cushion_shots.length > 0) {
-      candidates = candidates.concat(cushion_shots);
-    }
-  }
+ComputerPlayer.prototype.get_shot_candidates = function(legal_balls, cueball) {
+  var candidates = this.get_potting_candidates();
 
   candidates = this.grep_candidates(
       candidates, function(candidate) {return candidate.is_possible()});
-
-  candidates.sort(ShotCandidate.sort_by_difficulty);
-
-  if (has_easy) {
-    return candidates.length != 0 && candidates[0].is_easy();
-  }
 
   if (candidates.length > 0) {
     var easy = this.grep_candidates(
@@ -210,7 +262,7 @@ ComputerPlayer.prototype.set_ball_in_hand_position = function(legal_balls) {
     var position = table.random_position(cue_ball);
     cue_ball.position = position;
     if (cue_ball.is_legal_ball_in_hand_position(table, position) &&
-        this.get_shot_candidates(legal_balls, cue_ball, true)) {
+        this.get_easy_shot_candidates(legal_balls, cue_ball)) {
       positions.push(position);
     }
   }
