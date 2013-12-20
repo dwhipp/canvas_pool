@@ -96,7 +96,7 @@ ShotCandidatePath.prototype.characterize = function() {
   }
   for (var i = 0; i < this.segments.length; i++) {
     this.difficulty += this.segments[i].length() * (1 + i*2);
-    this.strength += this.segments[i].length() / 10 * (1 + i / 10);
+    this.strength += this.segments[i].length() / 10 * (1 + i / 8);
   }
   this.difficulty *= Math.sqrt(this.segments.length);
 }
