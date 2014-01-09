@@ -91,12 +91,24 @@ ShotCandidate.cushion_shot = function(
   return new ShotCandidate(table, cueball, cueball_cushion, path);
 }
 
+ShotCandidate.canon_shot = function(
+    table, cueball, cueball_cushion, target, object_ball, object_ball_cushion, pot_ball) {
+  if (object_ball == pot_ball || !pot_ball) {
+    return ShotCandidate.cushion_shot(
+        table, cueball, cueball_cushion, target, object_ball, object_ball_cushion);
+  }
+  var path = ShotCandidatePath.direct(object_ball, pot_ball, target);
+  if (!path) return null;
+  return ShotCandidate.cushion_shot(
+      table, cueball, cueball_cushion, path, object_ball, object_ball_cushion);
+}
+
 ShotCandidate.sort_by_difficulty = function(a,b) {
   return a.difficulty - b.difficulty
 }
 
 ShotCandidate.prototype.is_easy = function() {
-  return this.difficulty < 2.5;
+  return this.difficulty < 3;
 }
 
 ShotCandidate.prototype.is_moderate = function() {

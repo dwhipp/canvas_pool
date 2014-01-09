@@ -127,26 +127,37 @@ ComputerPlayer.prototype.get_potting_candidates = function() {
   var cushions = this.table.cushions;
   var candidates = [];
 
-  for (var ball_index = 0; ball_index < balls.length; ball_index++) {
-    var object_ball = balls[ball_index];
-    if (!game.ball_is_good_to_pot(object_ball, this) ||
-        !game.ball_is_ok_to_hit(object_ball, this)) {
-      continue;
+  for (var object_ball_index = 0; object_ball_index < balls.length;
+      object_ball_index++) {
+    var object_ball = balls[object_ball_index];
+    if (!game.ball_is_ok_to_hit(object_ball, this)) {
+        continue;
     }
-    for (var pocket_index = 0; pocket_index < pockets.length; pocket_index++) {
-      var pocket = pockets[pocket_index];
-      for (var cueball_cushion_index = 0;
-          cueball_cushion_index <= cushions.length; cueball_cushion_index++) {
-        var cueball_cushion = cushions[cueball_cushion_index];
-        for (var object_ball_cushion_index = 0;
-            object_ball_cushion_index <= cushions.length;
-            object_ball_cushion_index++) {
-          var object_ball_cushion = cushions[object_ball_cushion_index];
-          var candidate = this.get_shot(
-              cue_ball, cueball_cushion, object_ball, object_ball_cushion,
-              pocket);
-          if (candidate) {
-            candidates.push(candidate);
+
+    for (var pot_ball_index = 0; pot_ball_index < balls.length;
+        pot_ball_index++) {
+      var pot_ball = balls[pot_ball_index];
+      if (!game.ball_is_good_to_pot(pot_ball, this)) {
+        continue;
+      }
+
+      for (var pocket_index = 0; pocket_index < pockets.length;
+          pocket_index++) {
+        var pocket = pockets[pocket_index];
+        for (var cueball_cushion_index = 0;
+            cueball_cushion_index <= cushions.length; cueball_cushion_index++) {
+          // cueball_cushion null implies no cushion.
+          var cueball_cushion = cushions[cueball_cushion_index];
+          for (var object_ball_cushion_index = 0;
+              object_ball_cushion_index <= cushions.length;
+              object_ball_cushion_index++) {
+            var object_ball_cushion = cushions[object_ball_cushion_index];
+            var candidate = this.get_shot(
+                cue_ball, cueball_cushion, object_ball, object_ball_cushion,
+                pot_ball, pocket);
+            if (candidate) {
+              candidates.push(candidate);
+            }
           }
         }
       }
@@ -157,14 +168,15 @@ ComputerPlayer.prototype.get_potting_candidates = function() {
 }
 
 ComputerPlayer.prototype.get_shot = function(
-    cueball, cueball_cushion, object_ball, object_ball_cushion, pocket) {
+    cueball, cueball_cushion, object_ball, object_ball_cushion, pot_ball,
+    pocket) {
   if ((cueball_cushion || object_ball_cushion) && this.table.is_break_shot) {
     return null;
   }
 
-  var shot_candidate = ShotCandidate.cushion_shot(
+  var shot_candidate = ShotCandidate.canon_shot(
       this.table, cueball, cueball_cushion, pocket,
-      object_ball, object_ball_cushion);
+      object_ball, object_ball_cushion, pot_ball);
 
   if (shot_candidate && shot_candidate.is_possible()) {
     if (DEBUG) console.log("get_shot: ", shot_candidate);

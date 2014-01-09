@@ -82,7 +82,7 @@ ShotCandidatePath.prototype.characterize = function() {
     this.angular_difficulty = 1;
   }
   if (this.target.difficulty) {
-    this.difficulty = this.target.difficulty * this.angular_difficulty;
+    this.difficulty = this.target.difficulty * this.angular_difficulty + 1;
   } else {
     this.difficulty = 0;
   }

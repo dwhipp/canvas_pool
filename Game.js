@@ -483,6 +483,12 @@ Game_2ball.prototype.ball_is_ok_to_hit = function(ball, player) {
   return ball.name == name;
 }
 
+Game_2ball.prototype.ball_is_good_to_pot = function(ball, player) {
+  var name = this.current_player == 0 ? "red" : "yellow";
+  return ball.name == name;
+}
+
+
 /*
 Game_2ball.prototype.force_position_for_testing = function() {
   var table = this.table;
