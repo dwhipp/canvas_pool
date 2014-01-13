@@ -159,6 +159,12 @@ Ball.prototype.do_collision = function ( other ) {
   var distance = separation.magnitude();
   if (distance > this.radius * 2) return false;
 
+  var correction = other.velocity.difference(this.velocity).scale(0.0001);
+  while (distance < this.radius * 2) {
+    separation.add(correction);
+    distance = separation.magnitude();
+  }
+
   var collision_unit = separation.unit();
   var collision_speed = collision_unit.dot_product( this.velocity );
 
