@@ -1,19 +1,20 @@
 // Pockets are where balls are potted!
 
-function Pocket( x, y, radius ) {
-    this.position = new Vector(x,y);
-    this.radius = radius;
-    if (x > 0) {
-      x -= radius;
-    } else if (x < 0) {
-      x += radius;
-    }
-    if (y > 0) {
-      y -= radius;
-    } else if (y < 0) {
-      y += radius;
-    }
-    this.aimpoint = new Vector(x,y);
+function Pocket( x, y, ball_scale, pocket_scale) {
+  this.position = new Vector(x,y);
+  this.radius = ball_scale * pocket_scale;
+  var radius = ball_scale * (pocket_scale + 1);
+  if (x > 0) {
+    x -= radius;
+  } else if (x < 0) {
+    x += radius;
+  }
+  if (y > 0) {
+    y -= radius;
+  } else if (y < 0) {
+    y += radius;
+  }
+  this.aimpoint = new Vector(x,y);
 }
 
 Pocket.prototype.draw = function (ctx) {
@@ -63,7 +64,7 @@ Pocket.prototype.shot_would_pot_cueball = function(shot_candidate) {
 Pocket.prototype.get_aimpoint = function(ball) {
   var distance_to_aimpoint = this.position.distance_from(this.aimpoint)
   var distance_to_ball =
-      this.position.distance_from(ball.position) + ball.radius
+      this.position.distance_from(ball.position);
   if (distance_to_ball > distance_to_aimpoint) {
     return this.aimpoint;
   } else {

@@ -488,6 +488,15 @@ Game_2ball.prototype.ball_is_good_to_pot = function(ball, player) {
   return ball.name == name;
 }
 
+/*
+Game_1ball.prototype.force_position_for_testing = function() {
+  var table = this.table;
+  var base = new Vector(0, 0);
+  table.get_ball_by_name('cue').set_position(base, 0, 0);
+  table.get_ball_by_name('object').set_position(base, 27, 13);
+  table.ball_in_hand = 0;
+}
+*/
 
 /*
 Game_2ball.prototype.force_position_for_testing = function() {

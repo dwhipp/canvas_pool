@@ -12,12 +12,12 @@ Table.prototype.initialize = function ( game ) {
   this.pockets = new Array();
   this.cushions = new Array();
 
-  this.pockets.push(new Pocket( -1, -.5, ball_scale*pocket_scale ));
-  this.pockets.push(new Pocket( -1,  .5, ball_scale*pocket_scale ));
-  this.pockets.push(new Pocket(  0, -.5, ball_scale*pocket_scale ));
-  this.pockets.push(new Pocket(  0,  .5, ball_scale*pocket_scale ));
-  this.pockets.push(new Pocket(  1, -.5, ball_scale*pocket_scale ));
-  this.pockets.push(new Pocket(  1,  .5, ball_scale*pocket_scale ));
+  this.pockets.push(new Pocket( -1, -.5, ball_scale, pocket_scale ));
+  this.pockets.push(new Pocket( -1,  .5, ball_scale, pocket_scale ));
+  this.pockets.push(new Pocket(  0, -.5, ball_scale, pocket_scale ));
+  this.pockets.push(new Pocket(  0,  .5, ball_scale, pocket_scale ));
+  this.pockets.push(new Pocket(  1, -.5, ball_scale, pocket_scale ));
+  this.pockets.push(new Pocket(  1,  .5, ball_scale, pocket_scale ));
 
   this.cushions.push( new Cushion( -1, 0.5, 1, Math.PI/2, ball_scale*pocket_scale ) );
   this.cushions.push( new Cushion( 0, 0.5, 1, Math.PI/2, ball_scale*pocket_scale ) );
@@ -308,6 +308,13 @@ Table.prototype.path_blocked = function(ball_at_start, start_position, target, b
       return true;
     }
   }
+  var cushions = this.cushions;
+  for (var i = 0; i < cushions.length; i++) {
+    if (cushions[i].blocks_path(path)) {
+      return true;
+    }
+  }
+
   return false;
 }
 

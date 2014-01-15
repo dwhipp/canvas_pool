@@ -39,3 +39,15 @@ Polygon.prototype.draw = function (ctx) {
     ctx.closePath();
 }
 
+Polygon.prototype.intersects = function(line) {
+  var points = this.points;
+  var p = points[0];
+  for (i=1; i<points.length; ++i) {
+    var segment = new Line(p, points[i]);
+    if (line.intersect(segment)) {
+      return true;
+    }
+    p = points[i];
+  }
+  return false;
+}

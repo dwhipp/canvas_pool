@@ -111,3 +111,7 @@ Cushion.prototype.cushion_aimpoint = function(ball, target) {
   }
   return bounce_point;
 }
+
+Cushion.prototype.blocks_path = function(path) {
+  return this.polygon.intersects(path);
+}

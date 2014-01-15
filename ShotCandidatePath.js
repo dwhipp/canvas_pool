@@ -50,7 +50,11 @@ ShotCandidatePath.one_cushion = function(
   if (!cushion) {
     return ShotCandidatePath.direct(incoming_ball, object_ball, target);
   }
-  var bouncepoint = cushion.cushion_aimpoint(object_ball, target.aimpoint);
+  var target_aimpoint = target.aimpoint;
+  if (target.get_aimpoint) {
+    target_aimpoint = target.get_aimpoint(object_ball);
+  }
+  var bouncepoint = cushion.cushion_aimpoint(object_ball, target_aimpoint);
   if (!bouncepoint) return null;
   var cushion_target = { 'aimpoint': bouncepoint };
   var shot_candidate_path =
