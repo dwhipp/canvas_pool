@@ -63,6 +63,10 @@ function ShotCandidate(table, cueball, cueball_cushion, object_path) {
     this.impossible = "requires too much strength";
     return;
   }
+
+  if (this.strength < 0.3) {
+    this.strength += (0.3 - this.strength) * Math.random();
+  }
 }
 
 ShotCandidate.direct_shot = function(
@@ -126,8 +130,9 @@ ShotCandidate.prototype.shot_vector = function() {
   }
   var strength = this.strength;
   if (this.table.is_break_shot) {
-    strength = 0.8;
+    strength = 0.7;
   }
+  console.log(strength);
   return aim.unit().scale(strength * -1).add(this.cueball.position);
 }
 

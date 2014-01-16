@@ -8,7 +8,10 @@ function Pocket( x, y, ball_scale, pocket_scale) {
     x -= radius;
   } else if (x < 0) {
     x += radius;
+  } else {
+    radius = ball_scale * pocket_scale;
   }
+
   if (y > 0) {
     y -= radius;
   } else if (y < 0) {
