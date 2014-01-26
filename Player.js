@@ -156,6 +156,9 @@ ComputerPlayer.prototype.get_potting_candidates = function() {
                 cue_ball, cueball_cushion, object_ball, object_ball_cushion,
                 pot_ball, pocket);
             if (candidate) {
+              if (game.ball_is_great_to_pot(pot_ball, this)) {
+                candidate.difficulty *= 0.6;
+              }
               candidates.push(candidate);
             }
           }
@@ -237,8 +240,12 @@ ComputerPlayer.prototype.get_shot_candidates = function(legal_balls, cueball) {
 
     var moderate = this.grep_candidates(
         candidates, function(candidate) {return candidate.is_moderate()});
+    moderate.sort(ShotCandidate.sort_by_difficulty);
     if (DEBUG) console.log("Moderate: ", moderate.length, moderate);
     if (moderate.length > 0) {
+      var difficulty = moderate[0].difficulty * 1.5;
+      var moderate = this.grep_candidates(moderate,
+          function(candidate) { return candidate.difficulty < difficulty });
       return moderate;
     }
   }

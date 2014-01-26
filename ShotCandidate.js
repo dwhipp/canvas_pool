@@ -130,9 +130,8 @@ ShotCandidate.prototype.shot_vector = function() {
   }
   var strength = this.strength;
   if (this.table.is_break_shot) {
-    strength = 0.7;
+    strength = 0.8;
   }
-  console.log(strength);
   return aim.unit().scale(strength * -1).add(this.cueball.position);
 }
 

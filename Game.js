@@ -56,6 +56,10 @@ Game.prototype.ball_is_good_to_pot = function(ball, player) {
   return ball != this.table.cue_ball;
 }
 
+Game.prototype.ball_is_great_to_pot = function(ball, player) {
+  return false;
+}
+
 Game.prototype.create_ball = function ( x,y, color, name ) {
     var radius = ball_scale;
     var ysep = (1 + rack_ball_spacing) * radius * 1;
@@ -270,6 +274,10 @@ Game_9ball.prototype.next_ball_to_pot = function () {
 
 Game_9ball.prototype.ball_is_ok_to_hit = function(candidate_ball, player) {
   return this.next_ball_to_pot() == candidate_ball.name;
+}
+
+Game_9ball.prototype.ball_is_great_to_pot = function(candidate_ball, player) {
+  return candidate_ball.name == 9;
 }
 
 Game_9ball.prototype.super_ball_struck = Game.prototype.ball_struck;

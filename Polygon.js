@@ -39,7 +39,7 @@ Polygon.prototype.draw = function (ctx) {
     ctx.closePath();
 }
 
-Polygon.prototype.intersects = function(line) {
+Polygon.prototype.intersects = function(line, radius) {
   var points = this.points;
   var p = points[0];
   for (i=1; i<points.length; ++i) {
@@ -48,6 +48,14 @@ Polygon.prototype.intersects = function(line) {
       return true;
     }
     p = points[i];
+  }
+  if (radius) {
+    for (i=0; i < points.length; ++i) {
+      var d = points[i].distance_from_line(line);
+      if (d > 0 && d < radius) {
+        return true;
+      }
+    }
   }
   return false;
 }

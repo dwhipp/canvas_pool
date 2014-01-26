@@ -32,11 +32,16 @@ ShotCandidatePath.prototype.draw = function(ctx) {
   ctx.restore();
 }
 
-ShotCandidatePath.direct = function(incoming_ball, object_ball, target) {
+ShotCandidatePath.target_aimpoint = function(target, object_ball) {
   var target_aimpoint = target.aimpoint;
   if (target.get_aimpoint) {
     target_aimpoint = target.get_aimpoint(object_ball);
   }
+  return target_aimpoint;
+}
+
+ShotCandidatePath.direct = function(incoming_ball, object_ball, target) {
+  var target_aimpoint = ShotCandidatePath.target_aimpoint(target, object_ball);
   var target_to_ball = object_ball.position.difference(target_aimpoint);
   var ball_to_aimpoint =
       target_to_ball.unit().scale(object_ball.radius + incoming_ball.radius);
@@ -50,16 +55,13 @@ ShotCandidatePath.one_cushion = function(
   if (!cushion) {
     return ShotCandidatePath.direct(incoming_ball, object_ball, target);
   }
-  var target_aimpoint = target.aimpoint;
-  if (target.get_aimpoint) {
-    target_aimpoint = target.get_aimpoint(object_ball);
-  }
+  var target_aimpoint = ShotCandidatePath.target_aimpoint(target, object_ball);
   var bouncepoint = cushion.cushion_aimpoint(object_ball, target_aimpoint);
   if (!bouncepoint) return null;
   var cushion_target = { 'aimpoint': bouncepoint };
   var shot_candidate_path =
       ShotCandidatePath.direct(incoming_ball, object_ball, cushion_target);
-  shot_candidate_path.segments.push(new Line(bouncepoint, target.aimpoint));
+  shot_candidate_path.segments.push(new Line(bouncepoint, target_aimpoint));
   shot_candidate_path.target = target;
   return shot_candidate_path;
 }

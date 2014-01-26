@@ -1,23 +1,23 @@
 // Pockets are where balls are potted!
 
-function Pocket( x, y, ball_scale, pocket_scale) {
+function Pocket(table, x, y, ball_scale, pocket_scale) {
+  this.table = table;
   this.position = new Vector(x,y);
   this.radius = ball_scale * pocket_scale;
-  var radius = ball_scale * (pocket_scale + 1);
+  var aimpoint_vector = new Vector(0, 0);
   if (x > 0) {
-    x -= radius;
+    aimpoint_vector.x = -1;
   } else if (x < 0) {
-    x += radius;
-  } else {
-    radius = ball_scale * pocket_scale;
+    aimpoint_vector.x = 1;
   }
 
   if (y > 0) {
-    y -= radius;
+    aimpoint_vector.y = - 1;
   } else if (y < 0) {
-    y += radius;
+    aimpoint_vector.y = 1;
   }
-  this.aimpoint = new Vector(x,y);
+
+  this.aimpoint_vector = aimpoint_vector.unit();
 }
 
 Pocket.prototype.draw = function (ctx) {
@@ -35,9 +35,10 @@ Pocket.prototype.shot_would_pot_cueball = function(shot_candidate) {
   var aimpoint = shot_candidate.aimpoint;
   var object_ball = shot_candidate.object_ball;
   var cueball_destination = shot_candidate.cueball_destination;
+  var pocket_aimpoint = this.get_aimpoint(object_ball);
 
   // no in-off from hanging ball
-  if (this.aimpoint.distance_from(object_ball.position) < object_ball.radius ||
+  if (pocket_aimpoint.distance_from(object_ball.position) < object_ball.radius ||
       this.position.distance_from(object_ball.position) < object_ball.radius) {
     return false;
   }
@@ -52,7 +53,7 @@ Pocket.prototype.shot_would_pot_cueball = function(shot_candidate) {
   }
 
   var distance_from_pocket_aimpoint =
-      this.aimpoint.distance_from_line(path);
+      pocket_aimpoint.distance_from_line(path);
   if (distance_from_pocket_aimpoint != null &&
       distance_from_pocket_aimpoint < this.radius) {
     return true;
@@ -65,14 +66,18 @@ Pocket.prototype.shot_would_pot_cueball = function(shot_candidate) {
 // close to the mouth of the pocket, but if the ball is closer to the pocet than
 // that, then use the pocket itself.
 Pocket.prototype.get_aimpoint = function(ball) {
-  var distance_to_aimpoint = this.position.distance_from(this.aimpoint)
-  var distance_to_ball =
-      this.position.distance_from(ball.position);
-  if (distance_to_ball > distance_to_aimpoint) {
-    return this.aimpoint;
-  } else {
-    return this.position;
+  var table = this.table;
+  var aimpoint = this.position.clone();
+  var delta = this.aimpoint_vector;
+  var radius = this.radius + ball.radius * 2;
+  var scale = radius / 20;
+  for (var i = 0; i < 20; i++) {
+    if (!table.path_blocked(ball, ball.position, aimpoint, null)) {
+      return aimpoint;
+    }
+    aimpoint.add_scaled(delta, scale);
   }
+  return aimpoint;
 }
 
 Pocket.prototype.get_ball_in_hand_candidate = function(cueball, object_ball) {

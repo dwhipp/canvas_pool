@@ -81,6 +81,10 @@ Ball.prototype.end_update = function ( table ) {
   else
   {
     this.velocity.add( this.acceleration );
+    var clamp = 0.8;
+    if (this.velocity.magnitude() > clamp) {
+      this.velocity = this.velocity.unit().scale(clamp);
+    }
     return true;
   }
 }
@@ -89,9 +93,11 @@ Ball.prototype.resolve_cushion_impact = function ( impact ) {
   var speed = impact.dot_product( this.velocity );
   if (speed > 0) {
     this.velocity.add_scaled( impact, -2*speed );
+    this.acceleration.add_scaled( impact.normal(), this.side );
+  } else {
+    this.velocity.add_scaled( impact, 4*speed );
+    this.acceleration.add_scaled( impact.normal(), -this.side );
   }
-
-  this.acceleration.add_scaled( impact.normal(), this.side );
 
   // reduce energy
   this.velocity.scale(0.9);
