@@ -156,9 +156,6 @@ ComputerPlayer.prototype.get_potting_candidates = function() {
                 cue_ball, cueball_cushion, object_ball, object_ball_cushion,
                 pot_ball, pocket);
             if (candidate) {
-              if (game.ball_is_great_to_pot(pot_ball, this)) {
-                candidate.difficulty *= 0.6;
-              }
               candidates.push(candidate);
             }
           }
@@ -182,6 +179,14 @@ ComputerPlayer.prototype.get_shot = function(
       object_ball, object_ball_cushion, pot_ball);
 
   if (shot_candidate && shot_candidate.is_possible()) {
+    if (this.game.ball_is_great_to_pot(pot_ball, this)) {
+      shot_candidate.difficulty *= 0.6;
+      shot_candidate.strength = shot_candidate.base_strength;
+      if (!shot_candidate.cueball_cushion) {
+        shot_candidate.spin_strength = 0;
+        shot_candidate.difficulty *= 0.7;
+      }
+    }
     if (DEBUG) console.log("get_shot: ", shot_candidate);
     return shot_candidate;
   }

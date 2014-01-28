@@ -5,6 +5,8 @@ function ShotCandidate(table, cueball, cueball_cushion, object_path) {
   this.cueball = cueball;
   this.aimpoint = object_path.aimpoint;
   this.object_ball = object_path.ball;
+  this.spin_strength = (Math.random() - 0.75) / 2; // bias to back spin.
+  this.cueball_cushion = cueball_cushion;
 
   this.difficulty = 0;
   this.strength = 0.25;
@@ -18,6 +20,7 @@ function ShotCandidate(table, cueball, cueball_cushion, object_path) {
   if (cueball_cushion) {
     var bouncepoint =
         cueball_cushion.cushion_aimpoint(cueball, object_path.aimpoint);
+    this.spin_strength = 0.05;
     if (bouncepoint) {
       cueball_segments = [ new Line(cueball.position, bouncepoint),
                            new Line(bouncepoint, object_path.aimpoint) ];
@@ -42,7 +45,11 @@ function ShotCandidate(table, cueball, cueball_cushion, object_path) {
     return;
   }
 
-  this.strength = this.path.strength;
+  this.base_strength = this.path.strength;
+  this.strength = this.base_strength;
+  if (this.spin_strength < 0) {
+      this.strength -= this.spin_strength * this.path.segments[0].length() / 20;
+  }
   this.difficulty = this.path.difficulty;
 
   var aimpoint = this.aimpoint;
@@ -64,8 +71,8 @@ function ShotCandidate(table, cueball, cueball_cushion, object_path) {
     return;
   }
 
-  if (this.strength < 0.3) {
-    this.strength += (0.3 - this.strength) * Math.random();
+  if (this.strength < 0.3 && Math.random() < 0.5) {
+    this.strength += (0.3 - this.strength) * Math.random() * Math.random();
   }
 }
 
@@ -163,10 +170,17 @@ ShotCandidate.prototype.draw = function(ctx) {
   }
 }
 
+ShotCandidate.prototype.get_strike_point = function() {
+  var center = this.cueball.position;
+  var max = this.cueball.radius;
+  var direction = center.difference(this.shot_vector()).unit();
+  return direction.scale(this.spin_strength * max).add(center);
+}
+
 ShotCandidate.prototype.begin_shot = function(shot) {
   var table = this.table;
   table.shot_candidate = this;
-  shot.set_cueball_strikepoint(this.cueball, this.cueball.position);
+  shot.set_cueball_strikepoint(this.cueball, this.get_strike_point());
   shot.adjust(this.shot_vector());
 }
 
