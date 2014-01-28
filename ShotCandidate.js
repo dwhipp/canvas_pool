@@ -48,7 +48,7 @@ function ShotCandidate(table, cueball, cueball_cushion, object_path) {
   this.base_strength = this.path.strength;
   this.strength = this.base_strength;
   if (this.spin_strength < 0) {
-      this.strength -= this.spin_strength * this.path.segments[0].length() / 20;
+      this.strength -= this.spin_strength * this.path.segments[0].length() / 10;
   }
   this.difficulty = this.path.difficulty;
 
