@@ -182,6 +182,7 @@ ComputerPlayer.prototype.get_shot = function(
     if (this.game.ball_is_great_to_pot(pot_ball, this)) {
       shot_candidate.difficulty *= 0.6;
       shot_candidate.strength = shot_candidate.base_strength;
+      shot_candidate.great_shot = true;
       if (!shot_candidate.cueball_cushion) {
         shot_candidate.spin_strength = 0;
         shot_candidate.difficulty *= 0.7;
@@ -340,10 +341,31 @@ ComputerPlayer.prototype.begin_shot = function() {
     preview_shot(i % shot_candidates.length);
   }
 
+  var index = this.select_shot(shot_candidates);
   var index = Math.floor(Math.random() * shot_candidates.length);
 
   preview_shot(index);
 
   delay += 1000;
   setTimeout(function() { shot_candidates[index].commit_shot(shot) }, delay);
+}
+
+// assume candidates.length > 0;
+ComputerPlayer.prototype.select_shot = function(candidates) {
+  if (candidates[0].great_shot) {
+    return 0;
+  }
+  var cumulative = [];
+  var total = 0;
+  for (var i = 0; i < candidates.length; i++) {
+    total += candidates[i].difficulty;
+    cumulative.push(total);
+  }
+  var selection = Math.random() * total;
+  for (var i = 0; i < cumulative.length; i++) {
+    if (cumulative[i] > selection) {
+      return cumulative.length - i - 1;
+    }
+  }
+  return 0;
 }
