@@ -235,7 +235,13 @@ Ball.prototype.is_legal_ball_in_hand_position = function ( table, position ) {
 }
 
 Ball.prototype.blocks_path = function(line) {
-  var distance = this.position.distance_from_line(line);
+  var distance = Math.min(this.position.distance_from(line.start),
+                          this.position.distance_from(line.end));
+  if (distance < this.radius * 1.8) {
+    return true;
+  }
+
+  distance = this.position.distance_from_line(line);
   return distance != null && distance < this.radius * 2;
 }
 
